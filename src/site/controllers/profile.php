@@ -2,8 +2,8 @@
 
 /**
  * @version         $Id: profile.php 22338 2011-11-04 17:24:53Z github_bot $
- * @package         SocialLoginandSocialShare.Site
- * @subpackage      com_socialloginandsocialshare
+ * @package         LoginRadiusSocialLoginandSocialShare.Site
+ * @subpackage      com_loginradiussocialloginandsocialshare
  * @copyright       Copyright (C) 2005 - 2011 Open Source Matters, Inc. All rights reserved.
  * @license         GNU General Public License version 2 or later; see LICENSE.txt
  */
@@ -18,7 +18,7 @@ require_once JPATH_COMPONENT . '/controller.php';
  * @subpackage    com_users
  * @since        1.6
  */
-class SocialLoginAndSocialShareControllerProfile extends SocialLoginAndSocialShareController
+class LoginRadiusSocialLoginAndSocialShareControllerProfile extends LoginRadiusSocialLoginAndSocialShareController
 {
 
     /**
@@ -39,7 +39,7 @@ class SocialLoginAndSocialShareControllerProfile extends SocialLoginAndSocialSha
         // Check if the user is trying to edit another users profile.
         if ($userId != $loginUserId)
         {
-            JError::raiseError(403, JText::_('JERROR_ALERTNOAUTHOR'));
+            $app->enqueueMessage(JText::_('COM_SOCIALLOGIN_ALERTNOAUTHOR'), 'warning');
             return false;
         }
 
@@ -90,7 +90,7 @@ class SocialLoginAndSocialShareControllerProfile extends SocialLoginAndSocialSha
         $form = $model->getForm();
         if (!$form)
         {
-            JError::raiseError(500, $model->getError());
+            $app->enqueueMessage($model->getError(), 'error');
             return false;
         }
 
@@ -183,7 +183,7 @@ class SocialLoginAndSocialShareControllerProfile extends SocialLoginAndSocialSha
     {
         // Initialise variables.
         $app = JFactory::getApplication();
-        $model = $this->getModel('Profile', 'SocialLoginAndSocialShareModel');
+        $model = $this->getModel('Profile', 'LoginRadiusSocialLoginAndSocialShareModel');
         $user = JFactory::getUser();
         $userId = (int) $user->get('id');
         if ($user->get('guest') == 1)
@@ -201,7 +201,7 @@ class SocialLoginAndSocialShareControllerProfile extends SocialLoginAndSocialSha
         if ($deleted == true)
         {
             $this->setMessage(JText::_('COM_SOCIALLOGIN_LINK_ACCOUNT_DELETE'));
-            $this->setRedirect(JRoute::_('index.php?option=com_socialloginandsocialshare&view=profile', false));
+            $this->setRedirect(JRoute::_('index.php?option=com_loginradiussocialloginandsocialshare&view=profile', false));
         }
     }
 

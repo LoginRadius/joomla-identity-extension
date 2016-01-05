@@ -9,9 +9,9 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 jimport('joomla.application.component.controller');
 
 /**
- * General Controller of SocialLoginAndSocialShare component
+ * General Controller of LoginRadiusSocialLoginAndSocialShare component
  */
-class SocialLoginAndSocialShareController extends LRController
+class LoginRadiusSocialLoginAndSocialShareController extends LRController
 {
 
     /**
@@ -26,9 +26,9 @@ class SocialLoginAndSocialShareController extends LRController
         $document = JFactory::getDocument();
 
         // Set the default view name and format from the Request.
-        $vName = JRequest::getVar('view', 'login');
+        $vName = $this->input->getVar('view', 'login');
         $vFormat = $document->getType();
-        $lName = JRequest::getVar('layout', 'default');
+        $lName = $this->input->getVar('layout', 'default');
 
         if ($view = $this->getView($vName, $vFormat))
         {

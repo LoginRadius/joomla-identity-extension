@@ -8,8 +8,8 @@
  */
 defined('_JEXEC') or die;
 $session = JFactory::getSession();
-$settings = SocialLoginAndSocialShareHelperRoute::getSetting();
-$AccountMapRows = SocialLoginAndSocialShareHelperRoute::getAccountMapRows();
+$settings = LoginRadiusSocialLoginAndSocialShareHelperRoute::getSetting();
+$AccountMapRows = LoginRadiusSocialLoginAndSocialShareHelperRoute::getAccountMapRows();
 ?>
 <style>
     .AccountSetting-addprovider li {
@@ -37,7 +37,7 @@ $AccountMapRows = SocialLoginAndSocialShareHelperRoute::getAccountMapRows();
                     echo JURI::root() . 'images' . LRDS . 'sociallogin' . LRDS . $session->get('user_picture');
                 } else
                 {
-                    echo JURI::root() . 'media' . LRDS . 'com_socialloginandsocialshare' . LRDS . 'images' . LRDS . 'noimage.png';
+                    echo JURI::root() . 'media' . LRDS . 'com_loginradiussocialloginandsocialshare' . LRDS . 'images' . LRDS . 'noimage.png';
                 }
                 ?>" alt="<?php echo JFactory::getUser()->name ?>"
                      style="width:80px; height:auto;background: none repeat scroll 0 0 #FFFFFF; border: 1px solid #CCCCCC; display: block; margin: 2px 4px 4px 0; padding: 2px;">
@@ -47,13 +47,13 @@ $AccountMapRows = SocialLoginAndSocialShareHelperRoute::getAccountMapRows();
             </div>
         </div>
         <div style="float:right;width: 40%">
-                    <?php echo SocialLoginAndSocialShareHelperRoute::getInterface($settings); ?>
+                    <?php echo LoginRadiusSocialLoginAndSocialShareHelperRoute::getInterface($settings); ?>
             <div>
                 <ul class="AccountSetting-addprovider">
                             <?php foreach ($AccountMapRows as $row)
                             { ?>
                         <li>
-                            <form id="member-profile" action="<?php echo JRoute::_('index.php?option=com_socialloginandsocialshare&task=profile.removeSocialAccount'); ?>" method="post" class="form-validate" enctype="multipart/form-data">
+                            <form id="member-profile" action="<?php echo JRoute::_('index.php?option=com_loginradiussocialloginandsocialshare&task=profile.removeSocialAccount'); ?>" method="post" class="form-validate" enctype="multipart/form-data">
                                 <?php
                                 $msg = JText::_('COM_SOCIALLOGIN_LINK_ACCOUNT_MSG');
                                 if ($row->LoginRadius_id == $session->get('user_lrid'))
@@ -62,11 +62,11 @@ $AccountMapRows = SocialLoginAndSocialShareHelperRoute::getAccountMapRows();
                                 }
                                 ?>
     <?php echo $msg; ?>
-                                <span style="margin-right:5px;"> <img src="<?php echo JURI::root() . 'media' . LRDS . 'com_socialloginandsocialshare' . LRDS . 'images' . LRDS . $row->provider . '.png'; ?>"/></span>
+                                <span style="margin-right:5px;"> <img src="<?php echo JURI::root() . 'media' . LRDS . 'com_loginradiussocialloginandsocialshare' . LRDS . 'images' . LRDS . $row->provider . '.png'; ?>"/></span>
                                 <button type="submit" class="buttondelete">
                                     <span><?php echo JText::_('COM_SOCIALLOGIN_LINK_ACCOUNT_REMOVE'); ?></span>
                                 </button>
-                                <input type="hidden" name="option" value="com_socialloginandsocialshare"/>
+                                <input type="hidden" name="option" value="com_loginradiussocialloginandsocialshare"/>
                                 <input type="hidden" name="task" value="profile.removeSocialAccount"/>
                                 <input type="hidden" name="mapid" value="<?php echo $row->provider; ?>"/>
                                 <input type="hidden" name="lruser_id" value="<?php echo $row->LoginRadius_id; ?>"/>

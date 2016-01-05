@@ -19,7 +19,7 @@ jimport('joomla.application.component.view');
  * @since        1.6
  */
 
-class SocialLoginAndSocialShareViewProfile extends JViewLegacy
+class LoginRadiusSocialLoginAndSocialShareViewProfile extends JViewLegacy
 {
     protected $data;
     protected $form;
@@ -42,13 +42,13 @@ class SocialLoginAndSocialShareViewProfile extends JViewLegacy
 
         // Check for errors.
         if (count($errors = $this->get('Errors'))) {
-            JError::raiseError(500, implode('<br />', $errors));
+            JFactory::getApplication()->enqueueMessage(implode('<br />', $errors), 'error');
             return false;
         }
 
         // Check if a user was found.
         if (!$this->data->id) {
-            JError::raiseError(404, JText::_('JERROR_USERS_PROFILE_NOT_FOUND'));
+            JFactory::getApplication()->enqueueMessage(JText::_('COM_SOCIALLOGIN_USERS_PROFILE_NOT_FOUND'), 'error');
             return false;
         }
 

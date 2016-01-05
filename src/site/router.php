@@ -16,7 +16,7 @@ defined('_JEXEC') or die;
  * @return    array    The URL route with segments represented as an array.
  * @since    1.5
  */
-function SocialLoginAndSocialShareBuildRoute(&$query)
+function LoginRadiusSocialLoginAndSocialShareBuildRoute(&$query)
 {
     // Declare static variables.
     static $items;
@@ -88,7 +88,7 @@ function SocialLoginAndSocialShareBuildRoute(&$query)
  * @return    array    The array of variables to set in the request.
  * @since    1.5
  */
-function SocialLoginAndSocialShareParseRoute($segments)
+function LoginRadiusSocialLoginAndSocialShareParseRoute($segments)
 {
     // Initialise variables.
     $vars = array();
@@ -112,11 +112,7 @@ function SocialLoginAndSocialShareParseRoute($segments)
     {
         // Get the package id from the packages table by alias.
         $db = JFactory::getDbo();
-        $db->setQuery(
-                'SELECT `id`' .
-                ' FROM `#__users`' .
-                ' WHERE `id` = ' . $db->Quote($userId)
-        );
+        $db->setQuery('SELECT id FROM #__users WHERE id = ' . $db->Quote($userId));
         $userId = $db->loadResult();
     }
 
@@ -133,7 +129,7 @@ function SocialLoginAndSocialShareParseRoute($segments)
         }
     } else
     {
-        JError::raiseError(404, JText::_('JGLOBAL_RESOURCE_NOT_FOUND'));
+        JFactory::getApplication()->enqueueMessage(JText::_('JGLOBAL_RESOURCE_NOT_FOUND'), 'warning');
     }
 
     return $vars;

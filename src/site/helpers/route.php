@@ -16,7 +16,7 @@ defined('_JEXEC') or die;
  * @subpackage	com_users
  * @since		1.6
  */
-class SocialLoginAndSocialShareHelperRoute
+class LoginRadiusSocialLoginAndSocialShareHelperRoute
 {
 
     /**
@@ -101,7 +101,7 @@ class SocialLoginAndSocialShareHelperRoute
             }
             $document = JFactory::getDocument();
             $document->addScript('//hub.loginradius.com/include/js/LoginRadius.js');
-            $document->addScript(JURI::root(true) . '/modules/mod_socialloginandsocialshare/LoginRadiusSDK.2.0.0.js');
+            $document->addScript(JURI::root(true) . '/modules/mod_sociallogin/LoginRadiusSDK.2.0.0.js');
             $loginFunction = 'var lr_options={}; lr_options.login=true;LoginRadius_SocialLogin.util.ready(function () {$ui = LoginRadius_SocialLogin.lr_login_settings;$ui.interfacesize = "' . $iconSize . '";$ui.apikey = "' . $settings['apikey'] . '";$ui.is_access_token=true;' . $columns . '$ui.lrinterfacebackground = "' . $interfaceBackground . '";$ui.callback="' . JURI::current() . '";$ui.lrinterfacecontainer ="interfacecontainerdiv";LoginRadius_SocialLogin.init(lr_options); });
             LoginRadiusSDK.setLoginCallback(function () {
                 var token = LoginRadiusSDK.getToken();

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="3.0" type="plugin" group="content">
-    <name>Content - Social Share</name>
+<extension version="3.0" type="plugin" group="system">
+    <name>System - Social Login</name>
     <license>GNU/GPL</license>
     <author>LoginRadius</author>
     <authorEmail>developers@loginradius.com</authorEmail>
@@ -9,12 +9,14 @@
     <copyright>2013, LoginRadius</copyright>
     <version>4.0</version>
     <description>
-        LoginRadius enables social share for your joomla websites.
+        LoginRadius enables social login for your joomla websites.
     </description>
     <files>
-        <file plugin="socialshare">socialshare.php</file>
-        <file>socialshare.js</file>
+        <file plugin="sociallogin">sociallogin.php</file>
+        <file>LoginRadius.php</file>
+        <file>sociallogin.xml</file>
+        <folder>assets</folder>
+        <folder>helper</folder>
         <file>index.html</file>
-        <file>socialshare.xml</file>
     </files>
 </extension>

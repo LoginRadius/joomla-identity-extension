@@ -20,7 +20,7 @@ jimport('joomla.plugin.helper');
  * @subpackage    com_users
  * @since        1.6
  */
-class SocialLoginAndSocialShareModelProfile extends JModelForm
+class LoginRadiusSocialLoginAndSocialShareModelProfile extends JModelForm
 {
 
     /**
