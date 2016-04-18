@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" version="5.0" method="upgrade">
+    <name>User Registration and Management</name>
+    <license>Open Source License, GPL v2 based</license>
+    <author>LoginRadius</author>
+    <authorEmail>developers@loginradius.com</authorEmail>
+    <authorUrl>http://www.loginradius.com</authorUrl>
+    <creationDate>2016-01-01</creationDate>
+    <copyright>2016, LoginRadius</copyright>
+    <version>5.0</version>
+    <description>LoginRadius enables user registration for your joomla websites.</description>
+
+    <!-- Installation -->	
+    <scriptfile>install/script_userregistrationandmanagement.php</scriptfile>
+    <install>
+        <sql>
+            <file driver="mysql" charset="utf8">install/install.mysql.utf8.sql</file>
+        </sql>
+    </install>	
+    <uninstall>
+        <sql>
+            <file driver="mysql" charset="utf8">install/uninstall.mysql.utf8.sql</file>
+        </sql>
+    </uninstall>
+    <update> 
+        <schemas> 
+            <schemapath type="mysql">sql/updates</schemapath> 
+        </schemas> 
+    </update>
+    <!-- Component -->
+    <files folder="site">				
+        <filename>index.html</filename>
+        <filename>edit.xml</filename>
+        <filename>metadata.xml</filename>
+        <filename>userregistrationandmanagement.php</filename>
+        <filename>controller.php</filename>
+        <filename>router.php</filename>
+        <folder>views</folder>
+        <folder>controllers</folder>
+        <folder>models</folder>
+        <folder>assets</folder>
+        <folder>helpers</folder>		
+    </files>
+    <media destination="com_userregistrationandmanagement" folder="media">
+        <filename>index.html</filename>
+        <folder>images</folder>
+    </media>
+	
+    <!-- Administration -->
+    <administration>
+        <menu img="../media/com_userregistrationandmanagement/images/favicon.png">COM_USERREGISTRATIONANDMANAGEMENT</menu>
+        <submenu>
+            <menu view="userregistrationandmanagement">COM_USERREGISTRATIONANDMANAGEMENT</menu>
+            <menu view="socialsharing">COM_LOGINRADIUS_SOCIAL_SHARING</menu>
+            <menu view="usermanager">COM_LOGINRADIUS_USERMANAGER</menu>
+        </submenu>
+        <files folder="admin">
+            <folder>assets</folder>
+            <folder>install</folder>
+            <folder>models</folder>
+            <folder>views</folder>
+            <folder>sql/updates</folder>
+            <file>index.html</file>
+            <file>access.xml</file>
+            <file>controller.php</file>
+            <file>userregistrationandmanagement.php</file>
+        </files>
+        <languages folder="admin/language">
+            <language tag="en-GB">en-GB/en-GB.com_userregistrationandmanagement.ini</language>
+            <language tag="en-GB">en-GB/en-GB.com_userregistrationandmanagement.sys.ini</language>
+            <language tag="en-GB">en-GB/en-GB.plg_content_socialshare.ini</language>
+        </languages>
+    </administration>	
+    <languages folder="language">
+        <language tag="en-GB">en-GB/en-GB.com_userregistrationandmanagement.ini</language>
+        <language tag="en-GB">en-GB/en-GB.mod_userregistration.ini</language>
+        <language tag="en-GB">en-GB/en-GB.mod_userregistration.sys.ini</language>
+    </languages>
+	
+    <!-- Modules -->
+    <modules>
+        <module module="mod_userregistration" title="User Registration" position="position-7" order="8" client="site" language="*" showtitle="0">
+            <files folder="mod_userregistration">
+                <filename module="mod_userregistration">mod_userregistration.php</filename>
+                <folder>tmpl</folder>
+                <filename>mod_userregistration.xml</filename>
+                <filename>index.html</filename>
+            </files>		
+        </module>
+    </modules>	
+    
+    <!-- Plugins -->
+    <plugins>    
+        <plugin plugin="userregistration" title="System - User Registration" order="-100" group="system">
+            <files folder="plg_userregistration">
+                <file plugin="userregistration">userregistration.php</file>
+                <file>userregistration.xml</file>
+                <folder>css</folder>
+                <folder>js</folder>
+                <folder>helper</folder>
+                <folder>LoginRadiusSDK</folder>	
+                <file>index.html</file>
+            </files>
+        </plugin>
+        <plugin plugin="socialshare" title="Social Share Plugin" order="-100" group="content">
+            <files folder="plg_socialshare">
+                <file plugin="socialshare">socialshare.php</file>
+                <file>socialshare.xml</file>
+                <file>socialshare.js</file>
+                <file>index.html</file>			
+            </files>
+        </plugin>
+        <plugin plugin="singlesignon" title="Single Sign On Plugin" order="-100" group="system">
+            <files folder="plg_singlesignon">
+                <file plugin="singlesignon">singlesignon.php</file>
+                <file>singlesignon.xml</file>
+                <file>index.html</file>			
+            </files>
+        </plugin>
+    </plugins>	
+</extension>
