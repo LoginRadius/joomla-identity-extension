@@ -77,7 +77,7 @@ class UserRegistrationAndManagementViewProfile extends JViewLegacy {
     protected function prepareDocument() {
         $app = JFactory::getApplication();
         $document = JFactory::getDocument();
-        $document->addStyleSheet('components/com_userregistrationandmanagement/assets/css/profile.css');
+        $document->addStyleSheet('components/com_userregistrationandmanagement/assets/css/profile.min.css');
         $settings = $this->getSettings();
         $this->getInterface($settings);
         $menus = $app->getMenu();
@@ -122,118 +122,15 @@ class UserRegistrationAndManagementViewProfile extends JViewLegacy {
      * @param type $settings
      * @return type
      */
-    public function getInterface($settings) {
-        if (isset($settings['apikey']) && !empty($settings['apikey'])) {
-            $document = JFactory::getDocument();
-            $script = '';                
-
-      if (isset($settings['LoginRadius_termsAndCondition']) && $settings['LoginRadius_termsAndCondition'] != '') {              
-                 $termsCondition =  preg_replace('/\n+/', '', $settings['LoginRadius_termsAndCondition']);     
-                 $termsCondition =  preg_replace('/\r+/', '', $termsCondition);   
-                $script .= 'raasoption.termsAndConditionHtml = "' . str_replace(array('<script>','</script>'), '', $termsCondition) . '";';
-            }  
-            if (isset($settings['LoginRadius_formRenderDelay']) && is_numeric($settings['LoginRadius_formRenderDelay']) != '0') {
-                $script .= 'raasoption.formRenderDelay =  ' . $settings['LoginRadius_formRenderDelay'] . ';';
-            }
-
-            $min_length = isset($settings['LoginRadius_passwordMinLength']) ? $settings['LoginRadius_passwordMinLength'] : '';
-            $max_length = isset($settings['LoginRadius_passwordMaxLength']) ? $settings['LoginRadius_passwordMaxLength'] : '';
-            if (!empty($min_length) && !empty($max_length)) {
-                $password_length = '{min:' . $min_length . ',max:' . $max_length . '}';
-                $script .= 'raasoption.passwordlength = ' . $password_length . ';';
-            }
-            if (isset($settings['LoginRadius_GoogleRecapthaPublicKey']) && $settings['LoginRadius_GoogleRecapthaPublicKey'] != '') {
-                $script .= 'raasoption.V2RecaptchaSiteKey = "' . $settings['LoginRadius_GoogleRecapthaPublicKey'] . '";';
-            }
-            if (isset($settings['LoginRadius_enableFormValidationMsg']) && $settings['LoginRadius_enableFormValidationMsg'] != '' && $settings['LoginRadius_enableFormValidationMsg'] != 'false') {
-                $script .= 'raasoption.inFormvalidationMessage = ' . $settings['LoginRadius_enableFormValidationMsg'] . ';';
-            }
-            if (isset($settings['LoginRadius_forgotEmailTemplate']) && $settings['LoginRadius_forgotEmailTemplate'] != '') {
-                $script .= 'raasoption.forgotPasswordTemplate = "' . $settings['LoginRadius_forgotEmailTemplate'] . '";';
-            }
-
-            $emailVerifyOpt = isset($settings['LoginRadius_emailVerificationOption']) ? $settings['LoginRadius_emailVerificationOption'] : '';
-            if (isset($emailVerifyOpt) && $emailVerifyOpt != '') {
-                if ($emailVerifyOpt == '0') {
-                    if ($settings['LoginRadius_enableLoginOnEmailVerification'] != '' && $settings['LoginRadius_enableLoginOnEmailVerification'] != 'false') {
-                        $script .= 'raasoption.enableLoginOnEmailVerification = ' . $settings['LoginRadius_enableLoginOnEmailVerification'] . ';';
-                    } if ($settings['LoginRadius_enablePromptPassword'] != '' && $settings['LoginRadius_enablePromptPassword'] != 'false') {
-                        $script .= 'raasoption.promptPasswordOnSocialLogin = ' . $settings['LoginRadius_enablePromptPassword'] . ';';
-                    } if ($settings['LoginRadius_enableLoginWithUsername'] != '' && $settings['LoginRadius_enableLoginWithUsername'] != 'false') {
-                        $script .= 'raasoption.enableUserName = ' . $settings['LoginRadius_enableLoginWithUsername'] . ';';
-                    } if ($settings['LoginRadius_askEmailForUnverified'] != '' && $settings['LoginRadius_askEmailForUnverified'] != 'false') {
-                        $script .= 'raasoption.askEmailAlwaysForUnverified = ' . $settings['LoginRadius_askEmailForUnverified'] . ';';
-                    }
-                } elseif ($emailVerifyOpt == '1') {
-                    if ($settings['LoginRadius_enableLoginOnEmailVerification'] != '' && $settings['LoginRadius_enableLoginOnEmailVerification'] != 'false') {
-                        $script .= 'raasoption.enableLoginOnEmailVerification = ' . $settings['LoginRadius_enableLoginOnEmailVerification'] . ';';
-                    } if ($settings['LoginRadius_askEmailForUnverified'] != '' && $settings['LoginRadius_askEmailForUnverified'] != 'false') {
-                        $script .= 'raasoption.askEmailAlwaysForUnverified = ' . $settings['LoginRadius_askEmailForUnverified'] . ';';
-                    }
-                    $script .= 'raasoption.OptionalEmailVerification = true;';
-                } elseif ($emailVerifyOpt == '2') {
-                    $script .= 'raasoption.DisabledEmailVerification = true;';
-                }
-            }
-
-            if (isset($settings['LoginRadius_emailVerificationTemplate']) && $settings['LoginRadius_emailVerificationTemplate'] != '') {
-                $script .= 'raasoption.emailVerificationTemplate = "' . $settings['LoginRadius_emailVerificationTemplate'] . '";';
-            }
-
-            if (isset($settings['LoginRadius_customOption']) && $settings['LoginRadius_customOption'] != '') {
-                $jsondata = self::lr_raas_json_validate($settings['LoginRadius_customOption']);
-                if (is_object($jsondata)) {
-                    foreach ($jsondata as $key => $value) {
-                        $script .= "raasoption." . $key . "=";
-                        if (is_object($value) || is_array($value)) {
-                            $encodedStr = json_encode($value);
-                            $script.= $encodedStr . ';';
-                        } else {
-                            $script .= $value . ';';
-                        }
-                    }
-                } else {
-                    if (is_string($jsondata)) {
-                        $script .= $jsondata;
-                    }
-                }
-            }
-            $path = parse_url(JURI::base());
-            $basepath = $path['path'];    
-       
-            $document->addScript($basepath .'media/jui/js/jquery.js');              
-            $document->addScript($basepath .'media/jui/js/jquery-noconflict.js');    
-            $document->addScript($basepath .'media/jui/js/jquery.min.js');  
-  
-            $document->addScript('//hub.loginradius.com/include/js/LoginRadius.js');
-            $document->addScript('//cdn.loginradius.com/hub/prod/js/LoginRadiusRaaS.js');
-            $document->addScript(JURI::root() . 'components/com_userregistrationandmanagement/assets/js/jquery.ui.core.min.js');
-            $document->addScript(JURI::root() . 'components/com_userregistrationandmanagement/assets/js/jquery.ui.datepicker.min.js');
-            
-            $document->addStyleSheet(JURI::root() . 'components/com_userregistrationandmanagement/assets/css/jquery.ui.core.css');
-            $document->addStyleSheet(JURI::root() . 'components/com_userregistrationandmanagement/assets/css/jquery.ui.theme.css');
-            $document->addStyleSheet(JURI::root() . 'components/com_userregistrationandmanagement/assets/css/jquery.ui.datepicker.css');      
-            $document->addScript(JURI::root() . 'components/com_userregistrationandmanagement/assets/js/LoginRadiusFrontEnd.js');
-            $document->addStyleSheet(JURI::root() . 'components/com_userregistrationandmanagement/assets/css/lrcss.css');
-            $path = parse_url(JURI::base());
-            $domain = $path['scheme'] . '://' . $path['host'];
-          
-            $loginFunction = 'var raasoption = {};
-                var homeDomain = "' . JURI::base() . '";            
-                raasoption.appName = "' . $settings['sitename'] . '";
-                raasoption.apikey = "' . $settings['apikey'] . '";
-                raasoption.V2Recaptcha = true;
-                raasoption.emailVerificationUrl = "' . $domain . JRoute::_('index.php?option=com_userregistrationandmanagement&view=login') . '";
-                raasoption.forgotPasswordUrl = "' . $domain . JRoute::_('index.php?option=com_userregistrationandmanagement&view=login') . '";
-                raasoption.templatename = "loginradiuscustom_tmpl";
-                raasoption.hashTemplate = true; 
-                ' . $script . '
-                jQuery(document).ready(function () {
-                initializeResetPasswordRaasForm(raasoption); 
-                });';
-            $document->addScriptDeclaration($loginFunction);
+    public function getInterface($settings) {        
+        if (JVERSION < 3) {
+            $dispatcher = JDispatcher::getInstance();
+        } else {
+            $dispatcher = JEventDispatcher::getInstance();
         }
-    }
+        $dispatcher->trigger( 'getRaasOptions', array( $settings ) );
+    }    
+    
 
     public function getSettings() {
         $settings = array();

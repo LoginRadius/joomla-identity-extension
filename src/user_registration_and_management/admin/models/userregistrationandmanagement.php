@@ -110,6 +110,14 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
         $table = 'loginradius_advanced_settings';
       }
     }
+    elseif ($view == 'apilog') {    
+            $settings = array_merge($this->getSettings(), $settings);       
+            $result = $this->saveConfiguration($settings);
+
+            if ($result['status'] == 'message') {
+                $table = 'loginradius_settings';
+            }
+        }
 
     $this->updateSetting($table, $settings);
     return $result;
@@ -299,18 +307,24 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
    */
   private function updateSetting($table, $settings) {
     if (!empty($table)) {
-      $db = $this->getDbo();
-      $sql = "DELETE FROM #__" . $table;
-      $db->setQuery($sql);
-      $db->query();
+       $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->delete($db->quoteName('#__'.$table));       
+        $db->setQuery($query);
+        $db->execute();
       //Insert new settings
       foreach ($settings as $k => $v) {
-        $sql = "INSERT INTO #__" . $table . " ( setting, value )" . " VALUES ( " . $db->Quote($k) . ", " . $db->Quote($v) . " )";
-        $db->setQuery($sql);
-        $db->query();
-      }
+                $columns = array('setting', 'value');
+                $values = array($db->quote($k), $db->quote($v));
+                $query = $db->getQuery(true)
+                        ->insert($db->quoteName('#__' . $table))
+                        ->columns($db->quoteName($columns))
+                        ->values(implode(',', $values));
+                $db->setQuery($query);
+                $db->execute();
+            }
+        }
     }
-  }
 
   /**
    * Read Settings
@@ -320,13 +334,14 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
    */
   public function getSettings($advance = false) {
     $settings = array();
-    $db = $this->getDbo();
+    $db = $this->getDbo();    
+        
     $sql = "SELECT * FROM #__loginradius_settings";
-    if ($advance) {
+    if ($advance) {     
       $sql = "SELECT * FROM #__loginradius_advanced_settings";
     }
-
-    $db->setQuery($sql);
+    
+    $db->setQuery($sql);        
     $rows = $db->LoadAssocList();
 
     if (is_array($rows)) {
@@ -337,8 +352,7 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
     if (!isset($settings['choosehorizontalshare'])) {
       $settings['shareontoppos'] = '1';
       $settings['shareonbottompos'] = '1';
-    }
-    // $settings['shareontoppos'] = !isset($settings['shareontoppos']) && !isset($settings['shareonbottompos']) ? '1' : isset($settings['shareontoppos']);
+    }    
     return $settings;
   }
 
@@ -359,7 +373,7 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
    * @param type $settings
    * @return type
    */
-  public function saveConfiguration($settings) {
+  public function saveConfiguration($settings) {     
     if (empty($settings['apikey']) && empty($settings['apisecret'])) {
       $results['status'] = "error";
       $results['message'] = JText::_('COM_SOCIALLOGIN_ADVANCE_MESSAGE_12008');
@@ -373,6 +387,7 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
       $results['message'] = JText::_('COM_SOCIALLOGIN_ADVANCE_MESSAGE_SECRETKEY');
     }
     else {
+      
       $result = $this->saveApiSettings($settings);
       $results = $this->loginRadiusApiClient($result['url'], JURI::buildQuery($result['data']));
     }
@@ -393,7 +408,7 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
     $basicSettingThree = array('iconsize', 'iconsperrow', 'interfacebackground', 'showinterface', 'dummyemail', 'popupemailtitle', 'popupemailmessage', 'popuperroremailmessage', 'updateuserdata');
     $advanceSettingOne = array('basic', 'exlocation', 'exprofile', 'followcompanies', 'fbprofile', 'statusmessage', 'fbpost', 'twittermentions', 'groups', 'socialcontacts', 'fblike');
     $advanceSettingTwo = array('LoginRadius_facebookStatusEnable', 'LoginRadius_facebookStatusUrl', 'LoginRadius_facebookStatusTitle', 'LoginRadius_facebookDescription', 'LoginRadius_facebookStatus', 'LoginRadius_twitterStatusEnable', 'LoginRadius_twitterTweet', 'LoginRadius_linkedinPostEnable', 'LoginRadius_linkedinPostTitle', 'LoginRadius_linkedinPostTitle', 'LoginRadius_linkedinPostUrl', 'LoginRadius_linkedinPostImageUrl', 'LoginRadius_linkedinPostMessage');
-    $advanceSettingThree = array('LoginRadius_twitterDMEnable', 'twitterMessageFriends', 'LoginRadius_twitterDMSubject', 'LoginRadius_twitterDMMessage', 'LoginRadius_linkedinDMEnable', 'linkedinMessageFriends', 'LoginRadius_linkedinDMSubject', 'LoginRadius_linkedinDMMessage', 'LoginRadius_googleDMEnable', 'googleMessageFriends', 'LoginRadius_googleDMSubject', 'LoginRadius_googleDMMessage', 'LoginRadius_yahooEmailEnable', 'yahooMessageFriends', 'LoginRadius_yahooDMSubject', 'LoginRadius_yahooDMMessage');
+    $advanceSettingThree = array('LoginRadius_twitterDMEnable', 'twitterMessageFriends', 'LoginRadius_twitterDMSubject', 'LoginRadius_twitterDMMessage', 'LoginRadius_linkedinDMEnable', 'linkedinMessageFriends', 'LoginRadius_linkedinDMSubject', 'LoginRadius_linkedinDMMessage', 'LoginRadius_googleDMEnable', 'googleMessageFriends', 'LoginRadius_googleDMSubject', 'LoginRadius_googleDMMessage', 'LoginRadius_yahooEmailEnable','LoginRadius_yahooDMEnable', 'yahooMessageFriends', 'LoginRadius_yahooDMSubject', 'LoginRadius_yahooDMMessage');
 
     $string = $this->loginradius_get_string_format(1, $basicSettingOne, $settings);
     $string .= $this->loginradius_get_string_format(2, $basicSettingTwo, $settings);
@@ -402,11 +417,15 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
     $string .= $this->loginradius_get_string_format(5, $advanceSettingTwo, $settings);
     $string .= $this->loginradius_get_string_format(6, $advanceSettingThree, $settings);
 
+    $jinput = JFactory::getApplication()->input;
+    $agentstring = $jinput->server->get('HTTP_USER_AGENT', '', '');
+    $clientip = $jinput->server->get('REMOTE_ADDR', '', '');
+           
     $result['data'] = array(
       'addon' => $jversion->getLongVersion(),
-      'version' => '5.0',
-      'agentstring' => $_SERVER["HTTP_USER_AGENT"],
-      'clientip' => $_SERVER["REMOTE_ADDR"],
+      'version' => '5.0.1',
+      'agentstring' => $agentstring,
+      'clientip' => $clientip,
       'configuration' => $string
     );
     return $result;
@@ -439,116 +458,69 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
    * @return mixed|string
    */
   private function loginRadiusApiClient($validateUrl, $data) {
-    if ($this->getApiMethod()) {
-      $response = $this->curlApiMethod($validateUrl, $data);
+     $defaultHttpClient = new LoginRadiusSDK\Clients\DefaultHttpClient();
+    if ($this->getApiMethod()) {     
+     $response = json_decode($defaultHttpClient->request($validateUrl, $data));
     }
     else {
-      $response = $this->fsockopenApiMethod($validateUrl, $data);
+      $response = json_decode($defaultHttpClient->request($validateUrl, $data));    
     }
+    
     $results['status'] = "error";
     $message = isset($response->Messages) ? $response->Messages : array();
-
     $status = isset($response->Status) ? $response->Status : false;
+
     if ($status) {
       $results['status'] = "message";
       $results['message'] = JText::_('COM_SOCIALLOGIN_SETTING_SAVED');
-    }
-    elseif (in_array('API_KEY_NOT_VALID', $message)) {
+    }    
+    elseif (in_array('API_KEY_NOT_VALID', $message)) {      
       $results['message'] = JText::_('COM_SOCIALLOGIN_SAVE_SETTING_ERROR_ONE');
     }
-    elseif (in_array('API_KEY_NOT_FORMATED', $message) && in_array('API_SECRET_NOT_FORMATED', $message)) {
-      $results['message'] = JText::_('COM_SOCIALLOGIN_SAVE_SETTING_ERROR_FIVE');
+    elseif (in_array('API_KEY_NOT_FORMATED', $message) && in_array('API_SECRET_NOT_FORMATED', $message)) {  
+        $results['message'] = JText::_('COM_SOCIALLOGIN_SAVE_SETTING_ERROR_FIVE');
     }
-    elseif (in_array('API_KEY_NOT_FORMATED', $message)) {
-      $results['message'] = JText::_('COM_SOCIALLOGIN_SAVE_SETTING_ERROR_THREE');
+    elseif (in_array('API_KEY_NOT_FORMATED', $message)) {      
+        $results['message'] = JText::_('COM_SOCIALLOGIN_SAVE_SETTING_ERROR_THREE');
     }
-    elseif (in_array('API_SECRET_NOT_VALID', $message)) {
-      $results['message'] = JText::_('COM_SOCIALLOGIN_SAVE_SETTING_ERROR_TWO');
+    elseif (in_array('API_SECRET_NOT_VALID', $message)) {      
+        $results['message'] = JText::_('COM_SOCIALLOGIN_SAVE_SETTING_ERROR_TWO');
     }
-    else {
+    else {       
       $results['message'] = JText::_('COM_SOCIALLOGIN_SAVE_SETTING_ERROR_FOUR');
     }
     return $results;
   }
-
+ 
   /**
-   * @param $validateUrl
-   * @return mixed|string
-   */
-  private function fsockopenApiMethod($validateUrl, $data) {
-    if (!empty($data)) {
-      $options = array('http' =>
-        array(
-          'method' => 'POST',
-          'timeout' => 15,
-          'header' => 'Content-type: application/x-www-form-urlencoded',
-          'content' => $data
-        )
-      );
-      $context = stream_context_create($options);
-    }
-    else {
-      $context = NULL;
-    }
-    $JsonResponse = @file_get_contents($validateUrl, false, $context);
-    if (strpos(@$http_response_header[0], "400") !== false ||
-        strpos(@$http_response_header[0], "401") !== false ||
-        strpos(@$http_response_header[0], "403") !== false ||
-        strpos(@$http_response_header[0], "404") !== false ||
-        strpos(@$http_response_header[0], "500") !== false ||
-        strpos(@$http_response_header[0], "503") !== false) {
-      return JTEXT::_('COM_SOCIALLOGIN_SERVICE_AND_TIMEOUT_ERROR');
-    }
-    else {
-      return json_decode($JsonResponse);
-    }
-  }
-
-  /**
-   * @param $validateUrl
-   * @return mixed|string
-   */
-  private function curlApiMethod($validateUrl, $data) {
-    $curlHandle = curl_init();
-    curl_setopt($curlHandle, CURLOPT_URL, $validateUrl);
-    curl_setopt($curlHandle, CURLOPT_CONNECTTIMEOUT, 5);
-    curl_setopt($curlHandle, CURLOPT_TIMEOUT, 15);
-    curl_setopt($curlHandle, CURLOPT_SSL_VERIFYPEER, false);
-    if (!empty($data)) {
-      curl_setopt($curlHandle, CURLOPT_POST, 1);
-      curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $data);
-    }
-    if (ini_get('open_basedir') == '' && (ini_get('safe_mode') == 'Off' or ! ini_get('safe_mode'))) {
-      curl_setopt($curlHandle, CURLOPT_FOLLOWLOCATION, 1);
-      curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
-    }
-    else {
-      curl_setopt($curlHandle, CURLOPT_HEADER, 1);
-      $url = curl_getinfo($curlHandle, CURLINFO_EFFECTIVE_URL);
-      curl_close($curlHandle);
-      $curlHandle = curl_init();
-      $url = str_replace('?', '/?', $url);
-      curl_setopt($curlHandle, CURLOPT_URL, $url);
-      curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
-    }
-    $jsonResponse = curl_exec($curlHandle);
-    $httpCode = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
-    if (in_array($httpCode, array(400, 401, 403, 404, 500, 503, 0)) && $httpCode != 200) {
-      return JTEXT::_('COM_SOCIALLOGIN_SERVICE_AND_TIMEOUT_ERROR');
-    }
-    else {
-      if (curl_errno($curlHandle) == 28) {
-        return JTEXT::_('COM_SOCIALLOGIN_SERVICE_AND_TIMEOUT_ERROR');
-      }
-    }
-    $results = json_decode($jsonResponse);
-    curl_close($curlHandle);
-    return $results;
+   * clear api's logs
+   */  
+  
+   function clearLog() {    
+    $mainframe = JFactory::getApplication();
+    $cid = JRequest::getVar('cid');
+    $loggeduser = JFactory::getUser();
+    $db = JFactory::getDBO();
+    $query = $db->getQuery(true);
+    $messagedisplay = 0;
+    $message = JText::_('COM_SOCIALLOGIN_APILOG_NOTDELETED');
+    $megtype = 'error';   
+    
+        $query->delete($db->quoteName('#__loginradius_log'));       
+        $db->setQuery($query);
+        $db->execute();
+   
+          $messagedisplay++;
+          $message = JText::_('COM_SOCIALLOGIN_APILOG_DELETED');
+          $megtype = '';        
+  
+    $mainframe->redirect('index.php?option=com_userregistrationandmanagement&view=apilog', $message, $megtype);
   }
 
   /**
    * delete user data
-   */
+   */  
+  
   function remove() {
     $settings = self::getSettings();
     $raas_account = new LoginRadiusSDK\CustomerRegistration\AccountAPI($settings['apikey'], $settings['apisecret'], array('output_format' => 'json'));
@@ -563,24 +535,37 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
     foreach ($cid as $key => $value):        
       $self = $loggeduser->id == $value;
       if (!$self):  
-        $raas_uid = self::lr_raas_get_uid($value);   
+        $raas_uid = self::lrRaasGetUid($value);   
         if (isset($raas_uid) && !empty($raas_uid)) {     
           try {        
             $response = $raas_account->deleteAccount($raas_uid);
           }
           catch (LoginRadiusException $e) {    
           }
-        } 
+        }    
+        
+        $conditions = array(
+                    $db->quoteName('id') . ' = ' . $db->quote($value)
+                );
+                $conditions1 = array(
+                    $db->quoteName('userid') . ' = ' . $db->quote($value)
+                );
+                $query = $db->getQuery(true);
+                $query->delete($db->quoteName('#__users'));
+                $query->where($conditions);
+                $db->setQuery($query);
+                $db->execute();
+                $query = $db->getQuery(true);
+                $query->delete($db->quoteName('#__loginradius_users'));
+                $query->where($conditions);
+                $db->setQuery($query);
+                $db->execute();
+                $query = $db->getQuery(true);
+                $query->delete($db->quoteName('#__session'));
+                $query->where($conditions1);
+                $db->setQuery($query);
+                $db->execute();
 
-          $query = "DELETE FROM #__users WHERE id = " . $db->Quote($value);
-          $db->setQuery($query);
-          $db->query();
-          $query = "DELETE FROM #__loginradius_users WHERE id = " . $db->Quote($value);
-          $db->setQuery($query);
-          $db->query();
-          $query = "DELETE FROM #__session WHERE userid = " . $db->Quote($value);
-          $db->setQuery($query);
-          $db->query();
           $messagedisplay++;
           $message = JText::_('COM_SOCIALLOGIN_USERS_DELETED');
           $megtype = '';   
@@ -604,20 +589,27 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
     foreach ($cid as $key => $value):
       $self = $loggeduser->id == $value;
       if (!$self):
-        $raas_uid = self::lr_raas_get_uid($value);
+        $raas_uid = self::lrRaasGetUid($value);
          if (isset($raas_uid) && !empty($raas_uid)) {  
           try {
             $response = $raas_account->setStatus($raas_uid, false);  
           }
           catch (LoginRadiusException $e) {
           }
-         }
-         
-              $query = "UPDATE #__users SET block=0 WHERE id = " . $value;
-              $db->setQuery($query);
-              $db->query();
-              $messagedisplay++;       
-      endif;
+         }    
+              $query = $db->getQuery(true);
+                $fields = array(                    
+                    $db->quoteName('block') . ' = 0'
+                );
+                $conditions = array(                   
+                    $db->quoteName('id') . ' = ' . $db->quote($value)
+                );
+
+                $query->update($db->quoteName('#__users'))->set($fields)->where($conditions);
+                $db->setQuery($query);
+                $db->execute();
+                $messagedisplay++;  
+            endif;
     endforeach;
     if ($messagedisplay > 0):
       $mainframe->enqueueMessage($messagedisplay . ' ' . JText::_('COM_SOCIALLOGIN_USERS_ENABLE'));
@@ -639,18 +631,27 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
     foreach ($cid as $key => $value):
       $self = $loggeduser->id == $value;
       if (!$self):
-        $raas_uid = self::lr_raas_get_uid($value);    
+        $raas_uid = self::lrRaasGetUid($value);    
          if (isset($raas_uid) && !empty($raas_uid)) {  
           try {
             $response = $raas_account->setStatus($raas_uid, true);       
           }
           catch (LoginRadiusException $e) {
            }         
-        }
-          $query = "UPDATE #__users SET block=1 WHERE id = " . $value;
-          $db->setQuery($query);
-          $db->query();
-          $messagedisplay++;
+        }        
+        
+        $query = $db->getQuery(true);
+                $fields = array(                    
+                    $db->quoteName('block') . ' = 1'
+                );
+                $conditions = array(                   
+                    $db->quoteName('id') . ' = ' . $db->quote($value)
+                );
+
+                $query->update($db->quoteName('#__users'))->set($fields)->where($conditions);
+                $db->setQuery($query);
+                $db->execute();
+                $messagedisplay++;
       endif;
     endforeach;
     if ($messagedisplay > 0):
@@ -664,15 +665,17 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
    * 
    * get Uid
    */
-  public static function lr_raas_get_uid($acid) {
-    $db = JFactory::getDbo();
-    $query = "SELECT lu.Uid FROM #__loginradius_users AS lu WHERE lu.id = " . $db->Quote($acid);
-    $db->setQuery($query);
-    $results = $db->loadResult();
-    return $results;
-  }
+  public static function lrRaasGetUid($acid) {
+        $db = JFactory::getDbo();
+        $query = $db->getQuery(true);
+        $query->select('Uid')
+                ->from('#__loginradius_users')
+                ->where('id = ' . $db->Quote($acid));
+        $db->setQuery($query);
+        return $db->loadResult();
+    }
 
-  /**
+    /**
    * Activet user
    */
   function activate() {
@@ -680,10 +683,14 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
     $cid = JRequest::getVar('cid');
     JArrayHelper::toInteger($cid);
     $db = JFactory::getDBO();
-    $query = "UPDATE #__users SET activation = '' WHERE id IN(" . implode(',', $cid) . ")";
+    $query = $db->getQuery(true);
+        $fields = array(
+            $db->quoteName('activation') . ' = '. $db->quote('')
+        );  
+        $query->update($db->quoteName('#__users'))->set($fields) ->where('id IN (' . implode(',', $cid) . ')');
+                $db->setQuery($query);        
     $db->setQuery($query);
     $db->query();
     $mainframe->redirect('index.php?option=com_userregistrationandmanagement&view=usermanager', JText::_('COM_SOCIALLOGIN_USERS_ACTIVETED'));
   }
-
 }

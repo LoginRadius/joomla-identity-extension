@@ -274,7 +274,7 @@ class Com_UserRegistrationAndManagementInstallerScript
         if (count($status->modules) AND count($status->plugins))
         {
             ?>
-            <h2>User Registration And Management Installation</h2>
+            <h2><?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_TITLE'); ?></h2>
             <table class="adminlist table table-striped">
                 <thead>
                     <tr>
@@ -294,7 +294,7 @@ class Com_UserRegistrationAndManagementInstallerScript
                         <th></th>
                     </tr>
                     <tr class="row0">
-                        <td class="key" colspan="2"><?php echo 'User Registration And Management ' . JText::_('Component'); ?></td>
+                        <td class="key" colspan="2"><?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_MODULE') . JText::_('Component'); ?></td>
                         <td style="color:#6c9c31;"><strong><?php echo JText::_('Installed'); ?></strong></td>
                     </tr>
 
@@ -317,8 +317,7 @@ class Com_UserRegistrationAndManagementInstallerScript
                         ?>
                         <tr>
                             <th><?php echo JText::_('Plugin'); ?></th>
-                            <th><?php echo JText::_('Group'); ?></th>
-                <a href="../../../../../../xampp/htdocs/Joomla-raas/modules/mod_userregistrationandmanagement/helper.php"></a>
+                            <th><?php echo JText::_('Group'); ?></th>                
                             <th></th>
                         </tr>
                     <?php foreach ($status->plugins as $plugin) : ?>
@@ -336,8 +335,8 @@ class Com_UserRegistrationAndManagementInstallerScript
 
             <h2><?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_STATUS'); ?></h2>
             <p class="nowarning">
-            <?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_THANK'); ?> <strong>User Registration</strong>!
-            <?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_CONFIG'); ?> <a href="index.php?option=com_userregistrationandmanagement">User Registration <?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_COM'); ?></a>
+            <?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_THANK'); ?> <strong><?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_USERREGISTRATION'); ?></strong>!
+            <?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_CONFIG'); ?> <a href="index.php?option=com_userregistrationandmanagement"><?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_USERREGISTRATION'); ?><?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_COM'); ?></a>
             <?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_FREE'); ?> <a href="http://ish.re/10E8B" target="_blank"><?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_CONTACT'); ?></a> <?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_ASSIST'); ?>
                 <strong><?php echo JText::_('COM_SOCIALLOGIN_INSTALLATION_THANKYOU'); ?></strong>
             </p>

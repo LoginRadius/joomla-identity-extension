@@ -143,9 +143,12 @@ class UserRegistrationAndManagementModelUserManager extends JModelList
     public static function getsocialuserdata($id)
     {
         $socialdata = array();
-        $db = JFactory::getDbo();
-        $sql = "SELECT * FROM #__loginradius_users WHERE id = " . (int) $id;
-        $db->setQuery($sql);
+        $db = JFactory::getDbo();        
+        $query = $db->getQuery(true);
+        $query->select('*')
+                ->from('#__loginradius_users')
+                ->where('id = ' . (int) $id);     
+        $db->setQuery($query);     
         $rows = $db->LoadAssocList();
         if (is_array($rows))
         {
@@ -300,8 +303,6 @@ class UserRegistrationAndManagementModelUserManager extends JModelList
         $search = JString::strtolower($search);
 
         $query = "SELECT COUNT(DISTINCT juser.id) FROM #__users as juser ";
-
-        // $query .= " LEFT JOIN #__user_usergroup_map as `map` ON juser.id=map.user_id ";
 
         $query .= " WHERE juser.id>0";
 

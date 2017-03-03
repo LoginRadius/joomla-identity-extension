@@ -1,5 +1,5 @@
 jQuery(document).ready(function () {
-    //handleResponse(true, "");
+    //handleResponse(true, "");  
     jQuery("#fade, #lr-loading").click(function () {
         jQuery('#fade, #lr-loading').hide();
     });
@@ -182,16 +182,22 @@ function initializeResetPasswordRaasForm(raasoption) {
             });
         } else {
             LoginRadiusRaaS.init(raasoption, 'emailverification', function (response) {
+
                 //On Success this callback will call  
                 if (response.access_token != null && response.access_token != "") {
-                    handleResponse(true, "");
-                    raasRedirect(response.access_token);
+                     lrSetCookie('lr_message','Your email has been verified successfully');
+                    //handleResponse(true, "Your email has been verified successfully");
+                     raasRedirect(response.access_token);                    
                 } else {
-                    handleResponse(true, "Your email has been verified successfully");
+                    lrSetCookie('lr_message','Your email has been verified successfully');
+                    window.location.href = window.location.href.split('?')[0]+'?lrmessage=true&response=success';
+                   // handleResponse(true, "Your email has been verified successfully");
                 }
             }, function (response) {
+                lrSetCookie('lr_message',response[0].description);
+                window.location.href = window.location.href.split('?')[0]+'?lrmessage=true&response=error';
                 // on failure this function will call ‘errors’ is an array of error with message.
-                handleResponse(false, response[0].description, "", "error");
+                //handleResponse(false, response[0].description, "", "error");
             });
         }
     }
@@ -235,10 +241,15 @@ function initializeForgotPasswordRaasForms() {
 }
 function initializeAccountLinkingRaasForms() {
     LoginRadiusRaaS.init(raasoption, "accountlinking", function (response) {
+        if(response.isPosted != true){
         handleResponse(true, "");
         raasRedirect(response);
+    } 
+    else {
+       window.location.replace(profileUrl+'?lr-message=linkingsuccess');
+    }    
     }, function (response) {
-        jQuery('#fade').hide();
+        jQuery('#fade').hide();         
         if (response[0].description != null) {
             handleResponse(false, response[0].description, "", "error");
         }
@@ -296,4 +307,26 @@ function raasRedirect(token, name) {
         document.body.appendChild(form);
         form.submit();
     }
+}
+
+function lrSetCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function lrGetCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
 }

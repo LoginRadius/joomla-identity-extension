@@ -56,7 +56,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
                         <td><label for="post-fbstatus"><?php echo JText::_('COM_SOCIALLOGIN_POSTON_FACEBOOK_MESSAGE_STATUS'); ?></label>
                         </td>
                         <td>
-                            <textarea id="post-fbstatus" name="settings[LoginRadius_facebookStatus]" ><?php
+                            <textarea id="post-fbstatus" name="settings[LoginRadius_facebookStatus]"><?php
                                 if (isset($this->settings['LoginRadius_facebookStatus']))
                                 {
                                     echo trim($this->settings['LoginRadius_facebookStatus']);

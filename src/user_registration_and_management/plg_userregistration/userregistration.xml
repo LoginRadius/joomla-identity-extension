@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="5.0" type="plugin" group="system">
+<extension version="5.0.1" type="plugin" group="system">
     <name>User Registration Plugin</name>
     <license>GNU/GPL</license>
     <author>LoginRadius</author>
     <authorEmail>developers@loginradius.com</authorEmail>
     <authorUrl>http://www.loginradius.com</authorUrl>
-    <creationDate>2016-01-01</creationDate>
-    <copyright>2016 to till</copyright>
-    <version>5.0</version>
+    <creationDate>2017-01-01</creationDate>
+    <copyright>2017 to till</copyright>
+    <version>5.0.1</version>
     <description>
         LoginRadius enables User Registration for your joomla websites.
     </description>
     <files>
         <file plugin="userregistration">userregistration.php</file>
         <file>index.html</file> 
+        <file>customhttpclient.php</file>
         <folder>css</folder>
         <folder>js</folder>
         <folder>helper</folder>

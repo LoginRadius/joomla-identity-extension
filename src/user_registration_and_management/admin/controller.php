@@ -26,7 +26,7 @@ class UserRegistrationAndManagementController extends LRController
      */
     public function display($cachable = false, $urlparams = false)
     {
-        JRequest::setVar('view', JRequest::getCmd('view', 'UserRegistrationAndManagement'));
+        JRequest::setVar('view', JRequest::getCmd('view', 'UserRegistrationAndManagement'));    
         parent::display($cachable);
     }
 
@@ -34,11 +34,11 @@ class UserRegistrationAndManagementController extends LRController
      * Save settings
      */
     public function apply()
-    {
+    {     
         $mainframe = JFactory::getApplication();
-        $model = $this->getModel();
-        $view = JRequest::getVar('view', 'userregistrationandmanagement');
-        $option = JRequest::getVar('option', 'userregistrationandmanagement');
+        $model = $this->getModel();       
+        $view = JRequest::getVar('view', 'userregistrationandmanagement');         
+        $option = JRequest::getVar('option', 'userregistrationandmanagement');   
         $result = $model->saveSettings($view);
         $mainframe->enqueueMessage($result['message'], $result['status']);
         $this->setRedirect(JRoute::_('index.php?option=' . $option . '&view=' . $view . '&layout=default', false));
@@ -51,7 +51,7 @@ class UserRegistrationAndManagementController extends LRController
         $mainframe = JFactory::getApplication();
         $model = &$this->getModel();
         $view = JRequest::getVar('view', 'userregistrationandmanagement');
-        $result = $model->saveSettings($view);
+        $result = $model->saveSettings($view);        
         $mainframe->enqueueMessage($result['message'], $result['status']);
         $this->setRedirect(JRoute::_('index.php', false));
     }
@@ -99,12 +99,20 @@ class UserRegistrationAndManagementController extends LRController
         $model = $this->getModel();
         $model->remove();
     }
+    /**
+     * Clear Api log from api logs 
+     */
+    function clear()
+    {
+        $model = $this->getModel();      
+        $model->clearLog();
+    }
     
     /**
      * Unblock user account from user manager 
      */
     function unblock()
-    {
+    {   
         JRequest::checkToken() or jexit('Invalid Token');
         $model = $this->getModel();
         $model->enable();

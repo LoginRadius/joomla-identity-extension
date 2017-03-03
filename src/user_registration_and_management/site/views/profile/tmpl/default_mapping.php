@@ -14,11 +14,12 @@ if (!defined('LRDS'))
 JHtml::_('behavior.keepalive');
 $session = JFactory::getSession();
 $settings = UserRegistrationAndManagementHelperRoute::getSetting();
+$optionVal = isset($settings['LoginRadius_emailVerificationOption']) ? $settings['LoginRadius_emailVerificationOption'] : '';
 $AccountMapRows = UserRegistrationAndManagementHelperRoute::getAccountMapRows();
 $userPicture = $session->get('user_picture');
 ?>
 <fieldset id="users-profile-core">
-      <?php if($settings['enableAccountLinking'] == 'true' && $session->get('emailVerified')) {?>  
+    <?php if($settings['enableAccountLinking'] == 'true' && $session->get('emailVerified') && $optionVal != '2') {?>  
     <legend>
         <?php echo isset($settings['Loginradius_linkingIdentityString']) ? $settings['Loginradius_linkingIdentityString'] : JText::_('COM_SOCIALLOGIN_LINK_ACCOUNT_HEAD'); ?>
     </legend>
@@ -41,7 +42,7 @@ $userPicture = $session->get('user_picture');
                 <b><?php echo JFactory::getUser()->name ?></b>
             </div>
         </div>        
-        <?php if($settings['enableAccountLinking'] == 'true' && $session->get('emailVerified')) {?>  
+        <?php if($settings['enableAccountLinking'] == 'true' && $session->get('emailVerified') && $optionVal != '2') {?>  
         <div style="float:right;width: 45%">
             <script type="text/html" id="loginradiuscustom_tmpl">
                 <# if(isLinked) { #>
@@ -60,10 +61,18 @@ $userPicture = $session->get('user_picture');
                         </span> <span style="color:green"> <?php echo  JText::_('COM_SOCIALLOGIN_LINK_ACCOUNT_MSGONE') ?>
                             <# } else { #>
                         </span> <span class="lr-linked-label" style="margin-right:4px;"> <?php echo JText::_('COM_SOCIALLOGIN_LINK_ACCOUNT_MSG') ?>
-                            <ul class="btn-toolbar pull-right" style="margin: 0px;">
+                            <ul class="btn-toolbar pull-right" style="margin: 0px; display: inline-block; list-style: none; cursor:pointer;">
                                   <li class="btn-group">
                                       <a class="btn" onclick='return unLinkAccount(\"<#= Name.toLowerCase() #>\",\"<#= providerId #>\")'>
-                                          <i class="icon-trash"></i></a>
+                                              <?php                                             
+                                              if (JVERSION < 3) { ?>
+                                          <span class="unlinkBtn"><?php echo JText::_('unlink') ?></span>                                      
+                                              <?php } else { ?>
+                                                     <i class="icon-trash"></i>
+                                              <?php }?>
+                                             
+                                         
+                                      </a>
                                   </li>
                               </ul>
                             <# }  #>
@@ -73,7 +82,7 @@ $userPicture = $session->get('user_picture');
                     </div>
                 </div>
             </div> 
-                <# }  else {#>
+                <# } else {#>
                 <div class="lr-unlinked">
                     <div class="lr_icons_box">
                         <div style="width:100%">

@@ -24,13 +24,13 @@ class UserRegistrationAndManagementModelUserProfile extends JModelList
      * @param type $data
      * @return type
      */
-    public function getUserProfile($table, $data)
-    {
+    public function getUserProfile($table, $data) {
         $db = $this->getDbo();
-
-        $sql = "SELECT * FROM #__loginradius_" . $table . " WHERE user_id = " . (int) $data;
-        $db->setQuery($sql);
-
+        $query = $db->getQuery(true);
+        $query->select('*')
+                ->from('#__loginradius_' . $table)
+                ->where('user_id = ' . (int) $data);     
+        $db->setQuery($query);
         return $db->LoadAssocList();
     }
 
@@ -42,11 +42,13 @@ class UserRegistrationAndManagementModelUserProfile extends JModelList
      */
     public static function getCompanies($data)
     {
-        $db = JFactory::getDbo();
-        $sql = "SELECT * FROM #__loginradius_companies WHERE id = " . $data;
-        $db->setQuery($sql);
-        $rows = $db->LoadAssocList();
-        return $rows;
+        $db = JFactory::getDbo();   
+        $query = $db->getQuery(true);
+        $query->select('*')
+                ->from('#__loginradius_companies')
+                ->where('id = '.(int) $data);
+        $db->setQuery($query);
+        return $db->LoadAssocList(); 
     }
 
     /**
@@ -58,10 +60,14 @@ class UserRegistrationAndManagementModelUserProfile extends JModelList
     public function getSocialUserData($id)
     {
         $socialdata = array();
-        $db = JFactory::getDbo();
-        $sql = "SELECT * FROM #__loginradius_users WHERE id=" . (int) $id;
-        $db->setQuery($sql);
-        $rows = $db->LoadAssocList();
+        $db = JFactory::getDbo();     
+        $query = $db->getQuery(true);
+        $query->select('*')
+                ->from('#__loginradius_users')
+                ->where('id = '.(int) $id);
+        $db->setQuery($query);
+        $rows = $db->LoadAssocList();     
+        
         if (is_array($rows))
         {
             foreach ($rows as $key => $data)

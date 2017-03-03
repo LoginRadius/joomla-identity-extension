@@ -91,7 +91,11 @@ class UserRegistrationAndManagementControllerProfile extends UserRegistrationAnd
         
         // Force the ID to this user.
         $data['id'] = $userId;
-        $dispatcher = JEventDispatcher::getInstance();
+        if (JVERSION < 3) {
+            $dispatcher = JDispatcher::getInstance();
+        } else {
+            $dispatcher = JEventDispatcher::getInstance();
+        }
         $results = $dispatcher->trigger( 'onloginRadiusUserSave', array( $data ) );
         $app->enqueueMessage($results[0]['message'], $results[0]['status']);
         $this->setRedirect(JRoute::_('index.php?option=com_userregistrationandmanagement&view=updateprofile', false));       

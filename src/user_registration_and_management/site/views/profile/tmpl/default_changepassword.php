@@ -9,8 +9,7 @@
 defined('_JEXEC') or die;
 if (JFactory::getUser()->id) {
     ?>
-    <div class="messages" style="display:none">
-        <h2 class="element-invisible">Error message</h2>
+    <div class="messages" style="display:none">      
         <ul>
             <li id="messageinfo">
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package     UserRegistrationAndManagement.Administrator
  * @subpackage  com_userregistrationandmanagement
@@ -12,8 +13,7 @@ jimport('joomla.application.component.view');
 /**
  * Class generate view.
  */
-class UserRegistrationAndManagementViewSocialSharing extends JViewLegacy
-{
+class UserRegistrationAndManagementViewSocialSharing extends JViewLegacy {
 
     public $settings;
 
@@ -22,22 +22,21 @@ class UserRegistrationAndManagementViewSocialSharing extends JViewLegacy
      * 
      * @param type $tpl
      */
-    public function display($tpl = null)
-    {        
+    public function display($tpl = null) {
         $this->settings = $this->initialSetting();
-        $this->articles = $this->selectArticles();    
+        $this->articles = $this->selectArticles();
         $document = JFactory::getDocument();
         $version = '3';
         if (JVERSION < 3) {
             $version = '2';
         }
-        $document->addStyleSheet('components/com_userregistrationandmanagement/assets/css/socialloginandsocialshare' . $version . '.css');
+        $document->addStyleSheet('components/com_userregistrationandmanagement/assets/css/socialloginandsocialshare' . $version . '.min.css');
         $document->addScript('//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js');
         $document->addScript('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js');
         $document->addScriptDeclaration('$(function(){$("#horsortable").sortable({revert: true});});');
         $document->addScriptDeclaration('$(function(){$("#versortable").sortable({revert: true});});');
-        $document->addScript('components/com_userregistrationandmanagement/assets/js/simplifiedsocialshare.js');  
-  
+        $document->addScript('components/com_userregistrationandmanagement/assets/js/simplifiedsocialshare.min.js');
+
         $this->form = $this->get('Form');
         $this->addToolbar();
         parent::display($tpl);
@@ -47,8 +46,7 @@ class UserRegistrationAndManagementViewSocialSharing extends JViewLegacy
      * @param $model
      * @return mixed
      */
-    private function initialSetting()
-    {
+    private function initialSetting() {
         $settings = $this->getSettings();
 
         $shareProvider = array("facebook", "twitter", "pinterest", "googleplus", "linkedin");
@@ -85,29 +83,30 @@ class UserRegistrationAndManagementViewSocialSharing extends JViewLegacy
         $settings['facebookappid'] = (isset($settings['facebookappid']) ? $settings['facebookappid'] : "");
         $settings['customoptions'] = (isset($settings['customoptions']) ? $settings['customoptions'] : "");
 
-        
+
         return $settings;
     }
 
     /**
      * @return mixed
      */
-    private function selectArticles()
-    {
+    private function selectArticles() {
         $db = JFactory::getDBO();
-        $query = "SELECT id, title FROM #__content WHERE state = '1' ORDER BY ordering";
-        $db->setQuery($query);
-        $rows = $db->loadObjectList();
-        return $rows;
-    }
+        $query = $db->getQuery(true);
+        $query->select('id, title')
+                ->from('#__content')
+                ->where('state = ' . $db->Quote('1'))
+                ->order('ordering');
+        $db->setQuery($query);       
+        return $db->loadObjectList();      
+    }     
 
     /**
      * SocialLogin - Add admin option on toolbar
      */
-    protected function addToolbar()
-    {
+    protected function addToolbar() {
         JRequest::setVar('hidemainmenu', false);
-        JToolBarHelper::title(JText::_('COM_SOCIALLOGIN_ADVANCED_CONFIGURATION'), 'configuration.gif');
+        JToolBarHelper::title(JText::_('COM_SOCIALLOGIN_SOCIAL_SHARING'), 'configuration.gif');
         JToolBarHelper::apply('apply');
         JToolBarHelper::save('save', 'JTOOLBAR_SAVE');
         JToolBarHelper::cancel('cancel');
@@ -118,8 +117,7 @@ class UserRegistrationAndManagementViewSocialSharing extends JViewLegacy
      * 
      * @return type
      */
-    public function getSettings()
-    {
+    public function getSettings() {
         $settings = array();
         $db = JFactory::getDBO();
         $db->setQuery("CREATE TABLE IF NOT EXISTS #__loginradius_advanced_settings (
@@ -130,13 +128,14 @@ class UserRegistrationAndManagementViewSocialSharing extends JViewLegacy
 						UNIQUE KEY `setting` (`setting`)
 						) ENGINE=MyISAM  DEFAULT CHARSET=utf8;");
         $db->query();
-        $sql = "SELECT * FROM #__loginradius_advanced_settings";
-        $db->setQuery($sql);
+        
+        $query = $db->getQuery(true);
+        $query->select('*')
+                ->from('#__loginradius_advanced_settings');               
+        $db->setQuery($query);     
         $rows = $db->LoadAssocList();
-        if (is_array($rows))
-        {
-            foreach ($rows AS $key => $data)
-            {
+        if (is_array($rows)) {
+            foreach ($rows AS $key => $data) {
                 $settings [$data['setting']] = $data ['value'];
             }
         }

@@ -13,7 +13,6 @@ if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
 }
 
-
 require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration' . DS . 'LoginRadiusSDK' . DS . 'LoginRadius.php');
 require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration' . DS . 'LoginRadiusSDK' . DS . 'LoginRadiusException.php');
 require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration' . DS . 'LoginRadiusSDK' . DS . 'SocialLogin' . DS . 'SocialLoginAPI.php');
@@ -25,7 +24,6 @@ require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistrati
 require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration' . DS . 'LoginRadiusSDK' . DS . 'Clients' . DS . 'DefaultHttpClient.php');
 
 use LoginRadiusSDK\LoginRadiusException;
-
 /**
  * User Registration plugin helper class.
  */
@@ -45,7 +43,7 @@ class plgSystemUserRegistrationSendMessage {
             $subject = isset($settings['LoginRadius_' . $provider . 'DMSubject']) ? trim($settings['LoginRadius_' . $provider . 'DMSubject']) : '';
             $message = isset($settings['LoginRadius_' . $provider . 'DMMessage']) ? trim($settings['LoginRadius_' . $provider . 'DMMessage']) : '';
             self::postMessage($accessToken, $tos, $subject, $message, $settings);
-        } elseif (in_array($provider, array('google', 'yahoo'))) {
+        } elseif (in_array($provider, array('google', 'yahoo'))) {                
             $subject = isset($settings['LoginRadius_' . $provider . 'DMSubject']) ? trim($settings['LoginRadius_' . $provider . 'DMSubject']) : '';
             $message = isset($settings['LoginRadius_' . $provider . 'DMMessage']) ? trim($settings['LoginRadius_' . $provider . 'DMMessage']) : '';
             self::sendEmail($tos, $subject, $message);
@@ -59,17 +57,19 @@ class plgSystemUserRegistrationSendMessage {
      * @param type $subject
      * @param type $message
      */
-    public static function postMessage($accessToken, $tos, $subject, $message, $settings) {
+    public static function postMessage($accessToken, $tos, $subject, $message, $settings) {      
         $socialLoginObject = new LoginRadiusSDK\SocialLogin\SocialLoginAPI($settings['apikey'], $settings['apisecret'], array('authentication' => false, 'output_format' => 'json'));
         if (is_array($tos) && count($tos) > 0) {
             $mainframe = JFactory::getApplication();
             foreach ($tos as $to) {
                 try {
+                 
                     $sendMessage = $socialLoginObject->sendMessage($accessToken, $to, $subject, $message);
-                } catch (LoginRadiusException $e) {
-                    $e->getMessage();
-                    if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-                        $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
+                    
+                    } catch (LoginRadiusException $e) {
+                    if (isset($e->getErrorResponse()->message) && $e->getErrorResponse()->message) {
+                        
+                        $mainframe->enqueueMessage($e->getErrorResponse()->message, 'error');
                     }
                 }
             }
@@ -84,12 +84,13 @@ class plgSystemUserRegistrationSendMessage {
      * @param type $subject
      * @param type $message
      */
-    public static function sendEmail($tos, $subject, $message) {
-        if (is_array($tos) && count($tos) > 0) {
+    public static function sendEmail($tos, $subject, $message) {   
+        if (is_array($tos) && count($tos) > 0) {        
             $mainframe = JFactory::getApplication();
             $config = JFactory::getConfig();
             $fromName = $config->get('fromname');
             $from = $config->get('mailfrom');
+ 		
             foreach ($tos as $to) {
                 if (empty($to)) {
                     continue;
@@ -107,15 +108,16 @@ class plgSystemUserRegistrationSendMessage {
      * @param type $accessToken
      */
     public static function sendMessageToAllContacts($provider, $accessToken) {
+    
         $settings = plgSystemUserRegistrationTools::getSettings();
         $mainframe = JFactory::getApplication();
         $socialLoginObject = new LoginRadiusSDK\SocialLogin\SocialLoginAPI($settings['apikey'], $settings['apisecret'], array('authentication' => false, 'output_format' => 'json'));
         if (isset($settings['LoginRadius_' . $provider . 'DMEnable']) && $settings['LoginRadius_' . $provider . 'DMEnable'] == 1) {
+          
             if (isset($settings[$provider . 'MessageFriends']) && $settings[$provider . 'MessageFriends'] == 0) {
-                try {
-                    $contacts = $socialLoginObject->getContacts($accessToken, '0');
-                } catch (LoginRadiusException $e) {
-                    $e->getMessage();
+                try {                  
+                    $contacts = $socialLoginObject->getContacts($accessToken, '0');                   
+                } catch (LoginRadiusException $e) {         
                     if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
                         $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
                     }
@@ -143,8 +145,8 @@ class plgSystemUserRegistrationSendMessage {
      * @param type $provider
      * @param type $accessToken
      */
-    public static function sendMessageToSelctedContacts($tos, $provider, $accessToken) {
-        $settings = plgSystemUserRegistrationTools::getSettings();
+    public static function sendMessageToSelctedContacts($tos, $provider, $accessToken) {       
+        $settings = plgSystemUserRegistrationTools::getSettings();   
         if (isset($settings['LoginRadius_' . $provider . 'DMEnable']) && $settings['LoginRadius_' . $provider . 'DMEnable'] == 1) {
             self::socialSend($tos, $provider, $accessToken);
         }
@@ -159,31 +161,38 @@ class plgSystemUserRegistrationSendMessage {
      * @param type $message
      * @return type
      */
-    public static function friendInvatePopup($provider, $accessToken, $class, $message, $settings) {
+    public static function friendInvitePopup($provider, $accessToken, $class, $message, $settings) {
         $document = JFactory::getDocument();
+
         $mainframe = JFactory::getApplication();
         $socialLoginObject = new LoginRadiusSDK\SocialLogin\SocialLoginAPI($settings['apikey'], $settings['apisecret'], array('authentication' => false, 'output_format' => 'json'));
         try {
-            $contacts = $socialLoginObject->getContacts($accessToken);
-        } catch (LoginRadiusException $e) {
-            $e->getMessage();
-            if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-                $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
+            $contacts = $socialLoginObject->getContacts($accessToken);  
+        } catch (LoginRadiusException $e) {             
+            if (isset($e->getErrorResponse()->message) && $e->getErrorResponse()->message) {
+                $mainframe->enqueueMessage("Didn't get any contacts to send message", 'error');
             }
         }
         if (!isset($contacts) || is_string($contacts) || !isset($contacts->Data) || count($contacts->Data) == 0) {
             return true;
         }
-        $document->addStyleSheet(JURI::root() . 'plugins/system/userregistration/css/advancepopupstyle.css');
-        $document->addScript(JURI::root() . 'plugins/system/userregistration/js/friendinvate.js');
+        $document->addStyleSheet(JURI::root() . 'plugins/system/userregistration/css/advancepopupstyle.min.css');
+        if (JVERSION < 3) {
+            $document->addScript(JURI::root() . 'components/com_userregistrationandmanagement/assets/js/jquery.min.js');
+        }
+        else {         
+            $document->addScript(JUri::root(true) . '/media/jui/js/jquery.min.js');
+        }
+        $document->addScript(JURI::root(true) . '/plugins/system/userregistration/js/friendinvite.min.js', '', 'footer');
 
+            
         $output = '<div class="socialoverlay"></div>';
         $output .= '<div id="popupouter">';
-        $output .= '<form method="post" name="loginRadiusReferralForm" action="" class="form">';
         $output .= '<div class="socialpopupheading">Send Message</div>';
         $output .= '<div style="clear:both"></div>';
         $output .= '<div id="popupinner">';
-        $output .= '<div class="social' . $class . '">' . $message . '</div>';
+        $output .= '<div class="social' . $class . '" style="display:block">' . $message . '</div>';
+        $output .= '<div class="socialerror" style="display:none">Please select the contacts to send referral to</div>';
         for ($i = 0; $i < count($contacts->Data); $i++) {
             if (!JMailHelper::isEmailAddress($contacts->Data[$i]->EmailID) && !in_array($provider, array('twitter', 'linkedin'))) {
                 continue;
@@ -234,17 +243,16 @@ class plgSystemUserRegistrationSendMessage {
                 $output .= '<input type="hidden" name="loginRadiusReferralEmails[]" value="' . $contacts->Data[$i]->EmailID . '" />';
             }
         }
-        $output .= '<input type="hidden" name="loginRadiusIdentifier" value="' . $accessToken . '" />';
-        $output .= '<input type="hidden" name="loginRadiusProvider" value="' . $provider . '" /></div>';
+        $output .= '<input type="hidden" id="loginRadiusIdentifier" name="loginRadiusIdentifier" value="' . $accessToken . '" />';
+        $output .= '<input type="hidden" id="loginRadiusProvider" name="loginRadiusProvider" value="' . $provider . '" /></div>';
         $output .= '<div class="heading" style="border-bottom:none; border-top:1px solid #888888; border-top-left-radius: 0px !important; border-top-right-radius: 0px !important; border-bottom-left-radius: 8px !important; border-bottom-right-radius: 8px !important;">';
         $output .= '<div class="footerbox">';
-        $output .= '<input type="button" onclick="loginRadiusCheckAll(document.loginRadiusReferralForm, true)" id="" name="" value="Select All" class="inputbutton">&nbsp;&nbsp;';
-        $output .= '<input type="button" onclick="loginRadiusCheckAll(document.loginRadiusReferralForm, false)" name="" value="Deselect All" class="inputbutton" />&nbsp;&nbsp;';
-        $output .= '<input type="submit" name="loginRadiusReferralSubmit" value="Send Message" onclick="loginRadiusReferralSubmit = \'Submit\'" class="inputbutton">&nbsp;&nbsp;';
-        $output .= '<input type="submit" name="loginRadiusReferralSkip" value="Skip" onclick="loginRadiusReferralSubmit = \'Cancel\'" class="inputbutton" />';
+        $output .= '<input type="button" onclick="loginRadiusCheckAll(popupinner, true)" id="" name="" value="Select All" class="inputbutton">&nbsp;&nbsp;';
+        $output .= '<input type="button" onclick="loginRadiusCheckAll(popupinner, false)" name="" value="Deselect All" class="inputbutton" />&nbsp;&nbsp;';
+        $output .= '<input type="submit" id="loginRadiusReferralSubmit" name="loginRadiusReferralSubmit" value="Send Message" onclick="loginRadiusReferralSubmit = \'Submit\'" class="inputbutton">&nbsp;&nbsp;';
+        $output .= '<input type="submit" id="loginRadiusReferralSkip" name="loginRadiusReferralSkip" value="Skip" onclick="loginRadiusReferralSubmit = \'Cancel\'" class="inputbutton" />';
         $output .= '</div>';
         $output .= '</div>';
-        $output .= '</form>';
         $output .= '</div>';
         $document->addCustomTag($output);
         return false;
@@ -257,14 +265,16 @@ class plgSystemUserRegistrationSendMessage {
      * @param type $accessToken
      * @return boolean
      */
-    public static function friendInvatePopupController($provider, $accessToken) {
+    public static function friendInvitePopupController($provider, $accessToken) {
         $settings = plgSystemUserRegistrationTools::getSettings();
+     
         if (isset($settings['LoginRadius_' . $provider . 'DMEnable']) && in_array('1', array($settings['LoginRadius_' . $provider . 'DMEnable']))) {
+          
             if (in_array('1', array($settings[$provider . 'MessageFriends']))) {
-                return self::friendInvatePopup($provider, $accessToken, 'noerror', 'Please select your contacts from the list mentioned below to whom you want to send message', $settings);
+                
+                return self::friendInvitePopup($provider, $accessToken, 'noerror', 'Please select your contacts from the list mentioned below to whom you want to send message', $settings);
             }
         }
         return true;
     }
-
 }

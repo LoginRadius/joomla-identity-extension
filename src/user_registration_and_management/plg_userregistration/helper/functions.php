@@ -92,10 +92,11 @@ class plgSystemUserRegistrationFunctions
     public static function getK2UserID($id)
     {
         $db = JFactory::getDBO();
-
-        $query = "SELECT id FROM #__k2_users WHERE userID=" . $db->Quote($id);
+        $query = $db->getQuery(true)
+                            ->select('id')
+                            ->from($db->quoteName('#__k2_users'))
+                            ->where($db->quoteName('userID') . " = " . $db->quote($id));
         $db->setQuery($query);
-
         return $db->loadResult();
     }
 
@@ -139,16 +140,31 @@ class plgSystemUserRegistrationFunctions
             $path = JPATH_ROOT . DS . 'images' . DS . 'comprofiler' . DS;
             plgSystemUserRegistrationTools::insertUserPicture($path, $profileImage, $userImage);
             plgSystemUserRegistrationTools::insertUserPicture($path, $profileImage, 'tn'.$userImage);
-            $query = "SELECT id FROM #__comprofiler WHERE id=" . $db->Quote($userId);
+            $query = $db->getQuery(true)
+                            ->select('id')
+                            ->from($db->quoteName('#__comprofiler'))
+                            ->where($db->quoteName('id') . " = " . $db->quote($userId));  
             $db->setQuery($query);
             $updateId = $db->loadResult();
 
             if (!empty($updateId))
             {
-                $cbQuery = "UPDATE #__comprofiler SET `firstname` = " . $db->Quote($firstName) . ",`lastname` = " . $db->Quote($lastName) . ",`avatar` = " . $db->Quote($userImage) . " WHERE id=" . $db->Quote($userId);
+                    $cbQuery = $db->getQuery(true);
+		    $cbQuery->update($db->quoteName('#__comprofiler'))					
+						->set($db->quoteName('firstname') . ' = ' . $db->quote($firstName))
+						->set($db->quoteName('lastname') . ' = ' . $db->quote($lastName))
+						->set($db->quoteName('avatar') . ' = ' . $db->quote($userImage))
+						->where($db->quoteName('id') . ' = ' . $db->Quote($userId));                
+              
             } else
             {
-                $cbQuery = "INSERT INTO #__comprofiler (`id`,`user_id`,`firstname`,`lastname`,`avatar`) VALUES (" . $db->Quote($userId) . "," . $db->Quote($userId) . "," . $db->Quote($firstName) . "," . $db->Quote($lastName) . "," . $db->Quote($userImage) . ")";
+                $columns = array('id', 'user_id', 'firstname', 'lastname', 'avatar');
+                $values = array($db->quote($userId), $db->quote($userId), $db->quote($firstName), $db->quote($lastName), $db->quote($userImage));
+                $cbQuery = $db->getQuery(true)
+                        ->insert($db->quoteName('#__comprofiler'))
+                        ->columns($db->quoteName($columns))
+                        ->values(implode(',', $values));                
+                
             }
             $db->setQuery($cbQuery);
             $db->query();
@@ -209,19 +225,34 @@ class plgSystemUserRegistrationFunctions
             {
                 $gender = 'm';
             }
-
-            $query = "SELECT id FROM #__k2_users WHERE id=" . $db->Quote($userId);
+            $query = $db->getQuery(true)                
+                        ->select('id')
+                        ->from($db->quoteName('#__k2_users'))
+                        ->where($db->quoteName('id') . " = " . $db->quote($userId));           
             $db->setQuery($query);
             $updateId = $db->loadResult();
-
+            $jinput = JFactory::getApplication()->input;
+            $clientip = $jinput->server->get('REMOTE_ADDR', '', '');
             if (!empty($updateId))
             {
-                $k2query = "UPDATE #__k2_users SET `gender` = " . $db->Quote($gender) . ", `description` = " . $db->Quote($profileData->aboutme) . ", `image` = " . $db->Quote($userImage) . ", `url` = " . $db->Quote($profileData->website) . " WHERE id=" . $db->Quote($userId);
+                $k2query = $db->getQuery(true);
+		$k2query->update($db->quoteName('#__k2_users'))					
+						->set($db->quoteName('gender') . ' = ' . $db->quote($gender))
+						->set($db->quoteName('description') . ' = ' . $db->quote($profileData->aboutme))
+						->set($db->quoteName('image') . ' = ' . $db->quote($userImage))
+						->set($db->quoteName('url') . ' = ' . $db->quote($profileData->website))
+						->where($db->quoteName('id') . ' = ' . $db->Quote($userId));                    
+               
             } else
             {
-                $k2query = "INSERT INTO #__k2_users(`id`,`userID`,`userName`,`gender`,`description`,`image`,`url`,`group`,`ip`,`hostname`,`notes`) VALUES (" . $db->Quote($userId) . "," . $db->Quote($userId) . "," . $db->Quote($username) . "," . $db->Quote($gender) . "," . $db->Quote($profileData->aboutme) . "," . $db->Quote($userImage) . "," . $db->Quote($profileData->website) . "," . $db->Quote(trim($settings['k2group'])) . "," . $db->Quote($_SERVER['REMOTE_ADDR']) . "," . $db->Quote(gethostbyaddr($_SERVER['REMOTE_ADDR'])) . ",'')";
+                $columns = array('id', 'userID', 'userName', 'gender', 'description', 'image', 'url', 'group', 'ip', 'hostname', 'notes');
+                $values = array($db->quote($userId), $db->quote($userId), $db->quote($username), $db->quote($gender), $db->quote($profileData->aboutme), $db->quote($userImage), $db->quote($profileData->website), $db->quote(trim($settings['k2group'])), $db->quote($clientip), $db->quote(gethostbyaddr($clientip)), $db->quote(''));
+                $k2query = $db->getQuery(true)
+                        ->insert($db->quoteName('#__k2_users'))
+                        ->columns($db->quoteName($columns))
+                        ->values(implode(',', $values));
+               
             }
-
             $db->setQuery($k2query);
             $db->query();
         }
@@ -253,17 +284,34 @@ class plgSystemUserRegistrationFunctions
             $path = JPATH_ROOT . DS . 'media' . DS . 'kunena' . DS . 'avatars' . DS . 'users' . DS;
             $dumpUserImage = 'users/' . $userImage;
             plgSystemUserRegistrationTools::insertUserPicture($path, $profileImage, $userImage);
-
-            $query = "SELECT userid FROM #__kunena_users WHERE userid=" . $db->Quote($userId);
+            $query = $db->getQuery(true)                
+                        ->select('userid')
+                        ->from($db->quoteName('#__kunena_users'))
+                        ->where($db->quoteName('userid') . " = " . $db->quote($userId));               
+           
             $db->setQuery($query);
             $updateId = $db->loadResult();
 
             if (!empty($updateId))
             {
-                $kunenaQuery = "UPDATE #__kunena_users SET `avatar` = " . $db->Quote($dumpUserImage) . ",`gender` = " . $db->Quote($profileData->gender) . ",`birthdate` = " . $db->Quote($profileData->dob) . ",`location` = " . $db->Quote($profileData->city) . ",`personalText` = " . $db->Quote($profileData->aboutme) . ",`websiteurl` = " . $db->Quote($profileData->website) . " WHERE `userid` = " . $db->Quote($userId);
+                $kunenaQuery = $db->getQuery(true);
+		$kunenaQuery->update($db->quoteName('#__kunena_users'))					
+						->set($db->quoteName('avatar') . ' = ' . $db->quote($dumpUserImage))
+						->set($db->quoteName('gender') . ' = ' . $db->quote($profileData->gender))
+						->set($db->quoteName('birthdate') . ' = ' . $db->quote($profileData->dob))
+						->set($db->quoteName('location') . ' = ' . $db->quote($profileData->city))
+						->set($db->quoteName('personalText') . ' = ' . $db->quote($profileData->aboutme))
+						->set($db->quoteName('websiteurl') . ' = ' . $db->quote($profileData->website))
+						->where($db->quoteName('userid') . ' = ' . $db->Quote($userId));                
             } else
             {
-                $kunenaQuery = "INSERT INTO #__kunena_users (`userid`,`avatar`,`gender`,`birthdate`,`location`,`personalText`,`websiteurl`) VALUES(" . $db->Quote($userId) . "," . $db->Quote($dumpUserImage) . "," . $db->Quote($profileData->gender) . "," . $db->Quote($profileData->dob) . "," . $db->Quote($profileData->city) . "," . $db->Quote($profileData->aboutme) . "," . $db->Quote($profileData->website) . ")";
+                    $columns = array('userid', 'avatar', 'gender', 'birthdate', 'location', 'personalText', 'websiteurl');
+                    $values = array($db->quote($userId), $db->quote($dumpUserImage), $db->quote($profileData->gender), $db->quote($profileData->dob), $db->quote($profileData->city), $db->quote($profileData->aboutme), $db->quote($profileData->website));
+                    $kunenaQuery = $db->getQuery(true)
+                            ->insert($db->quoteName('#__kunena_users'))
+                            ->columns($db->quoteName($columns))
+                            ->values(implode(',', $values));                     
+                
             }
             $db->setQuery($kunenaQuery);
             $db->query();
@@ -293,17 +341,29 @@ class plgSystemUserRegistrationFunctions
                 $path = JPATH_ROOT . DS . 'images' . DS . 'avatar' . DS;
                 $avatar = 'images/avatar/' . $userImage;
                 plgSystemUserRegistrationTools::insertUserPicture($path, $profileImage, $userImage);
-
-                $query = "SELECT userid FROM #__community_users WHERE userid=" . $db->Quote($userId);
+                $query = $db->getQuery(true)                
+                        ->select('userid')
+                        ->from($db->quoteName('#__community_users'))
+                        ->where($db->quoteName('userid') . " = " . $db->quote($userId));
                 $db->setQuery($query);
                 $updateId = $db->loadResult();
 
                 if (!empty($updateId))
                 {
-                    $jsQuery = "UPDATE #__community_users SET `avatar` = " . $db->Quote($avatar) . ",`thumb` = " . $db->Quote($avatar) . " WHERE userid=" . $db->Quote($userId);
+                    $jsQuery = $db->getQuery(true);
+		    $jsQuery->update($db->quoteName('#__community_users'))					
+						->set($db->quoteName('avatar') . ' = ' . $db->quote($avatar))
+						->set($db->quoteName('thumb') . ' = ' . $db->quote($avatar))
+						->where($db->quoteName('userid') . ' = ' . (int) $pk);                                        
+                   
                 } else
                 {
-                    $jsQuery = "INSERT INTO #__community_users(`userid`,`avatar`,`thumb`) VALUES(" . $db->Quote($userId) . "," . $db->Quote($avatar) . "," . $db->Quote($avatar) . ")";
+                    $columns = array('userid', 'avatar', 'thumb');
+                    $values = array($db->quote($userId), $db->quote($avatar), $db->quote($avatar));
+                    $jsQuery = $db->getQuery(true)
+                            ->insert($db->quoteName('#__community_users'))
+                            ->columns($db->quoteName($columns))
+                            ->values(implode(',', $values));                    
                 }
                 $db->setQuery($jsQuery);
                 $db->query();

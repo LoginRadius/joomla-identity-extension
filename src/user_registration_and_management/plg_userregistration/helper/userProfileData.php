@@ -11,18 +11,6 @@ jimport('joomla.user.helper');
 if (!defined('DS')) {
   define('DS', DIRECTORY_SEPARATOR);
 }
-$mainframe = JFactory::getApplication();
-
-require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration'. DS .'LoginRadiusSDK'. DS .'LoginRadius.php');
-require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration'. DS .'LoginRadiusSDK'. DS .'LoginRadiusException.php');
-require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration'. DS .'LoginRadiusSDK'. DS .'SocialLogin'. DS .'SocialLoginAPI.php');
-require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration'. DS .'LoginRadiusSDK'. DS .'SocialLogin'. DS .'GetProvidersAPI.php');
-require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration'. DS .'LoginRadiusSDK'. DS .'CustomerRegistration'. DS .'UserAPI.php');
-require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration'. DS .'LoginRadiusSDK'. DS .'CustomerRegistration'. DS .'CustomObjectAPI.php');
-require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration'. DS .'LoginRadiusSDK'. DS .'CustomerRegistration'. DS .'AccountAPI.php');
-require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration'. DS .'LoginRadiusSDK'. DS .'Clients'. DS .'IHttpClient.php');
-require_once (JPATH_ROOT . DS . 'plugins' . DS . 'system' . DS . 'userregistration'. DS .'LoginRadiusSDK'. DS .'Clients'. DS .'DefaultHttpClient.php');
-
 use LoginRadiusSDK\LoginRadiusException;
 use LoginRadiusSDK\SocialLogin\SocialLoginAPI;
 /**
@@ -62,8 +50,11 @@ class plgSystemUserRegistrationUserProfileData
     public static function removeExtendedUserRow($userId, $columname, $tablename)
     {
         $db = JFactory::getDBO();
-        $db->setQuery("DELETE FROM `#__loginradius_" . $tablename . "` WHERE " . $columname . " = " . $db->Quote($userId));
-        $db->query();
+        $query = $db->getQuery(true);
+        $query->delete($db->quoteName('#__loginradius_' . $tablename));
+        $query->where($db->quoteName($columname) . " = " . $db->quote($userId));
+        $db->setQuery($query);
+        $db->execute();     
     }
 
     /**
@@ -89,10 +80,12 @@ class plgSystemUserRegistrationUserProfileData
             }
             $string .= ', ' . $db->Quote($value);
         }
-
-        $db->setQuery("INSERT INTO `#__loginradius_" . $tablename . "` VALUES (" . $db->Quote($userId) . $string . ")");
-        $db->query();
-    }
+        	$query = $db->getQuery(true)
+                ->insert($db->quoteName('#__loginradius_' . $tablename))
+                ->values($db->Quote($userId) . $string);
+                $db->setQuery($query);
+                $db->execute();
+        }
 
     /**
      * Save profile data in database.
@@ -134,7 +127,7 @@ class plgSystemUserRegistrationUserProfileData
     {
         $keysArray = array("Website", "Favicon", "Industry", "About", "TimeZone", "Verified", "UpdatedTime", "Created", "RelationshipStatus", "Quote", "InterestedIn",
             "Interests", "Religion", "Political", "HttpsImageUrl", "FollowersCount", "FriendsCount", "IsGeoEnabled", "TotalStatusesCount",
-            "NumRecommenders", "Honors", "Associations", "Hireable", "RepositoryUrl", "Age", "ProfessionalHeadline", "AccessToken", "TokenSecret");
+            "NumRecommenders", "Honors", "Associations", "Hireable", "RepositoryUrl", "Age", "ProfessionalHeadline", "AccessToken", "TokenSecret", "NoOfLogins");
         $profileDataObject->AccessToken = plgSystemUserRegistrationTools::checkVariable($profileDataObject->ProviderAccessCredential, 'AccessToken');
         $profileDataObject->TokenSecret = plgSystemUserRegistrationTools::checkVariable($profileDataObject->ProviderAccessCredential, 'TokenSecret');
         $data = self::manageArray($profileDataObject, $keysArray);
@@ -472,11 +465,8 @@ class plgSystemUserRegistrationUserProfileData
         try {
         $contacts = $loginRadiusObject->getContacts($accessToken, $nextCursor);   
         }
-        catch (LoginRadiusException $e) {
-          $e->getMessage();
-          if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-            $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
-          }
+        catch (LoginRadiusException $e) {   
+//            $mainframe->enqueueMessage($e->getErrorResponse()->message, 'error');
         }
     if (isset($contacts) && !is_string($contacts) && isset($contacts->Data) && count($contacts->Data) > 0)
         {
@@ -524,12 +514,9 @@ class plgSystemUserRegistrationUserProfileData
             try {
                $events = $loginRadiusObject->getEvents($accessToken);
             }
-            catch (LoginRadiusException $e) {
-              $e->getMessage();
-              if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-            $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
-           } 
-          }
+             catch (LoginRadiusException $e) {   
+//            $mainframe->enqueueMessage($e->getErrorResponse()->message, 'error');
+            }
           if (!is_string($events) && count($events) > 0)
             {
                 $keysArray = array("ID", "Name", "StartTime", "EndTime", "Location", "RsvpStatus", "Description", "UpdatedDate", "Privacy", "OwnerId", "OwnerName");
@@ -556,12 +543,9 @@ class plgSystemUserRegistrationUserProfileData
             try {
                $posts = $loginRadiusObject->getPosts($accessToken);
             }
-            catch (LoginRadiusException $e) {
-              $e->getMessage();
-              if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-            $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
-            }
-            }        
+              catch (LoginRadiusException $e) {   
+//            $mainframe->enqueueMessage($e->getErrorResponse()->message, 'error');
+             }       
             if (!is_string($posts) && count($posts) > 0)
             {
                 $keysArray = array("ID", "Name", "Title", "StartTime", "UpdateTime", "Message", "Place", "Picture", "Likes", "Share", "Post");
@@ -582,18 +566,15 @@ class plgSystemUserRegistrationUserProfileData
     public static function linkedinCompanies($userId, $provider, $accessToken, $settings)
     {
        $mainframe = JFactory::getApplication();
-        if ($provider == 'linkedin' && isset($settings['followcompanies']) && $settings['followcompanies'] == '1')
+        if (($provider == 'linkedin' || $provider == 'facebook') && isset($settings['followcompanies']) && $settings['followcompanies'] == '1')
         {
            $loginRadiusObject = new SocialLoginAPI($settings['apikey'], $settings['apisecret'], array('authentication'=>false, 'output_format' => 'json'));
             try {
-               $linkedInCompanies = $loginRadiusObject->getFollowedCompanies($accessToken);                  
+               $linkedInCompanies = $loginRadiusObject->getFollowedCompanies($accessToken);     
             }
-            catch (LoginRadiusException $e) {
-              $e->getMessage();
-              if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-            $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
-        }
-            }          
+              catch (LoginRadiusException $e) {   
+//            $mainframe->enqueueMessage($e->getErrorResponse()->message, 'error');
+             }        
             if (isset($linkedInCompanies) && !empty($linkedInCompanies) && !is_string($linkedInCompanies) && count($linkedInCompanies) > 0)
             {
                 $keysArray = array("ID", "Name");
@@ -620,12 +601,9 @@ class plgSystemUserRegistrationUserProfileData
             try {
                $statusReport = $loginRadiusObject->getStatus($accessToken);
             }
-            catch (LoginRadiusException $e) {
-              $e->getMessage();
-              if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-            $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
-        }
-            }      
+              catch (LoginRadiusException $e) {   
+//            $mainframe->enqueueMessage($e->getErrorResponse()->message, 'error');
+              }     
             if (isset($statusReport) && !is_string($statusReport) && count($statusReport) > 0)
             {
                 $keysArray = array('Id', 'Text', 'DateTime', 'Likes', 'Place', 'Source', 'ImageUrl', 'LinkUrl');
@@ -652,12 +630,9 @@ class plgSystemUserRegistrationUserProfileData
             try {
                $mentions = $loginRadiusObject->getMentions($accessToken);
             }
-            catch (LoginRadiusException $e) {
-              $e->getMessage();
-              if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-            $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
-        }
-            }         
+              catch (LoginRadiusException $e) {   
+//            $mainframe->enqueueMessage($e->getErrorResponse()->message, 'error');
+             }      
             if (!is_string($mentions) && count($mentions) > 0)
             {
                 $keysArray = array('Id', 'Text', 'DateTime', 'Likes', 'Place', 'Source', 'ImageUrl', 'LinkURL', 'Name');
@@ -684,12 +659,9 @@ class plgSystemUserRegistrationUserProfileData
             try {
                $groups = $loginRadiusObject->getGroups($accessToken);             
             }
-            catch (LoginRadiusException $e) {
-              $e->getMessage();
-             if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-            $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
-        }
-            }
+             catch (LoginRadiusException $e) {   
+//            $mainframe->enqueueMessage($e->getErrorResponse()->message, 'error');
+             }
            
             if (isset($groups) && !is_string($groups) && count($groups) > 0)
             {
@@ -717,12 +689,9 @@ class plgSystemUserRegistrationUserProfileData
             try {
                $facebookLikes = $loginRadiusObject->getLikes($accessToken);              
             }
-            catch (LoginRadiusException $e) {
-              $e->getMessage();
-             if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-            $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
-        }
-            }
+              catch (LoginRadiusException $e) {   
+//            $mainframe->enqueueMessage($e->getErrorResponse()->message, 'error');
+              }
             
            if (!is_string($facebookLikes) && isset($facebookLikes) && !empty($facebookLikes))
             {

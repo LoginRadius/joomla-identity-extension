@@ -280,8 +280,15 @@ class UserRegistrationAndManagementModelProfile extends JModelForm
     public function removeSocialAccount($mapProvider, $mapUserId)
     {
         $db = JFactory::getDBO();
-        $sql = "DELETE FROM #__loginradius_users WHERE provider = " . $db->Quote($mapProvider) . " AND LoginRadius_id = " . $db->Quote($mapUserId) . " AND id = " . JFactory::getUser()->id;
-        $db->setQuery($sql);
+        $query = $db->getQuery(true);
+        $conditions = array(
+            $db->quoteName('provider') . ' = '.$db->quote($mapProvider),
+            $db->quoteName('LoginRadius_id') . ' = '.$db->quote($mapUserId),
+            $db->quoteName('id') . ' = '.$db->quote(JFactory::getUser()->id)
+        );
+        $query->delete($db->quoteName('#__loginradius_users'));
+        $query->where($conditions);          
+        $db->setQuery($query);
         if ($db->execute())
         {
             return true;

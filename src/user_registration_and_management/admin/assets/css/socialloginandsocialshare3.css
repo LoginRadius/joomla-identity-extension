@@ -17,9 +17,12 @@ input[type="radio"],
 input[type="checkbox"] {
     margin: 0 !important;
 }
-
+#responsiveimg {
+    margin-top: -34px;
+    margin-left: 17px;
+}
 .imagehori {
-    margin-top:15px;
+    margin-top: 15px;
 }
 .loginRadiusProviders {
     width: 160px;
@@ -57,17 +60,14 @@ input[type="checkbox"] {
 .ossProviders, .ossCounterProviders {
     width: 22%;
     float: left;
-    padding: 0px;
+    padding: 0;
 }
-#sharehorizontal label img {
-    margin-left: 10px;
-}
+
 #sharevertical label {
     margin-right: 10px;
     float: left;
     padding-right: 25px;
 }
-
 
 div.current input,
 div.current textarea,
@@ -85,14 +85,14 @@ dd {
 
 dt.tabs h3 {
     float: left;
-    margin-right: 4px;
+    margin-right: 1px;
     border: #CCC 1px solid;
-    padding: 9px;
+    padding: 8px;
     margin-bottom: 0px;
     margin-left: 2px;
     border-bottom: 0px;
     background: #fff;
-    font-size : 16px !important;    
+    font-size : 13px !important;    
 }
 
 div.current {
@@ -361,48 +361,48 @@ div.current {
     max-width: 460px;
 }
 
-.section70{
-    float:left;
-    width:70%;
+.section70 {
+    float: left;
+    width: 70%;
 }
-.section30{
-    float:right;
-    width:29%;
+.section30 {
+    float: right;
+    width: 29%;
 }
 .socialBox{
-    background:#EAF7FF;
+    background: #EAF7FF;
     border: 1px solid #B3E2FF;
-    overflow:auto;
-    margin:0 0 10px 0;
+    overflow: auto;
+    margin: 0 0 10px 0;
 }
-.section70 .welcome{
+.section70 .welcome {
     background: #EAF7FF;
     overflow: auto;
     margin: 0px 10px;
     border-bottom: 1px solid #B3E2FF;
 }
 
-.socialBox h3{
-    padding:8px 0px 8px 0px;
+.socialBox h3 {
+    padding: 8px 0px 8px 0px;
     border-bottom: 1px solid #B3E2FF;
     color: #000000; 
-    margin:10px;
+    margin: 10px;
 }
-.socialBox p{
+.socialBox p {
     line-height: 19px;
-    font-size:12px !important;
-    margin:10px !important;
+    font-size: 12px !important;
+    margin: 10px !important;
     text-align: justify;
 }
-.section70 fieldset{
-    background:#EAF7FF; 
+.section70 fieldset {
+    background: #EAF7FF; 
     border: 1px solid #B3E2FF;
 }
-.section70 .welcome_text{
-    width:90%; 
-    line-height:160%;
+.section70 .welcome_text {
+    width: 90%; 
+    line-height: 160%;
 }
-.section70 .btn-small{
+.section70 .btn-small {
     margin: 10px;
 }
 

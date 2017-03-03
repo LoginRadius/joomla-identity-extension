@@ -9,6 +9,7 @@
  defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
   $yesUserData = $notUserData= "";
+
 if ($this->settings['updateuserdata'] == '1')
 {
     $yesUserData = "checked='checked'";
@@ -37,12 +38,14 @@ if ($this->settings['updateuserdata'] == '1')
         <tr class="sociallogin_row_white">
             <th class="head" colspan="2"><?php echo JText::_('COM_SOCIALLOGIN_USER_EMAIL_POPUP_SETTING'); ?></th>
         </tr>
+        <?php if((isset($this->settings['enableHostedPage']) && $this->settings['enableHostedPage'] != 'true') || (!isset($this->settings['enableHostedPage']))) {?>
         <tr class="sociallogin_row_white emailpopup">
             <td colspan="2"><span class="sociallogin_subhead"><?php echo JText::_('COM_SOCIALLOGIN_SETTING_EMAIL_TITLE'); ?></span><br/><br/>
                 <input size="60" type="text" class="span5 input_box" name="settings[popupemailtitle]" id="popupemailtitle" value="<?php echo $this->settings['popupemailtitle']; ?>"/>
                 <br/>
             </td>
         </tr>
+        <?php }?>
         <tr class="sociallogin_row_white">
             <td colspan="2"><span class="sociallogin_subhead"><?php echo JText::_('COM_SOCIALLOGIN_SETTING_USERPROFILEDATE_UPDATE'); ?></span><br/><br/>
                 <input name="settings[updateuserdata]" type="radio" <?php echo $yesUserData; ?> value="1" style="margin:0"/> <?php echo JText::_('COM_SOCIALLOGIN_YES'); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -59,6 +62,7 @@ if ($this->settings['updateuserdata'] == '1')
             </tr>
         <?php } ?>
     </table>
+    <?php if((isset($this->settings['enableHostedPage']) && $this->settings['enableHostedPage'] != 'true') || (!isset($this->settings['enableHostedPage']))) {?>
     <table class="form-table sociallogin_table">
         <tr>
             <th class="head" colspan="2"><?php echo JText::_('COM_SOCIALLOGIN_RAAS_ADDITIONAL_SETTING'); ?></th>
@@ -126,13 +130,13 @@ if ($this->settings['updateuserdata'] == '1')
         <tr>
             <td colspan="2"><span class="sociallogin_subhead"><?php echo JText::_('COM_SOCIALLOGIN_EMAIL_VERIFICATION_OPTIONS'); ?></span><br/><br />
                 <label for="emailVerification-required">
-                    <input onchange="showAndHideUI();" class="emailVerificationOptions" id="emailVerification-required" style="margin:0" type="radio" name="settings[LoginRadius_emailVerificationOption]" value="0" <?php echo(isset($this->settings['LoginRadius_emailVerificationOption']) && $this->settings['LoginRadius_emailVerificationOption'] == 0) ? "checked" : ""; ?> /> <?php echo JText::_('COM_SOCIALLOGIN_REQUIRED_EMAIL_VERIFICATION'); ?>
+                    <input onchange="showAndHideUI();" class="emailVerificationOptions" id="emailVerification-required" style="margin:0" type="radio" name="settings[LoginRadius_emailVerificationOption]" value="0" <?php echo(!isset($this->settings['LoginRadius_emailVerificationOption']) || $this->settings['LoginRadius_emailVerificationOption'] == 0) ? "checked" : ""; ?> /> <?php echo JText::_('COM_SOCIALLOGIN_REQUIRED_EMAIL_VERIFICATION'); ?>
                 </label>
                 <label for="emailVerification-optional">
-                    <input onchange="showAndHideUI();" class="emailVerificationOptions" id="emailVerification-optional" style="margin:0" type="radio" name="settings[LoginRadius_emailVerificationOption]" value="1" <?php echo(!isset($this->settings['LoginRadius_emailVerificationOption']) || $this->settings['LoginRadius_emailVerificationOption'] == 1) ? "checked" : ""; ?>  /> <?php echo JText::_('COM_SOCIALLOGIN_OPTIONAL_EMAIL_VERIFICATION'); ?>                    
+                    <input onchange="showAndHideUI();" class="emailVerificationOptions" id="emailVerification-optional" style="margin:0" type="radio" name="settings[LoginRadius_emailVerificationOption]" value="1" <?php echo(isset($this->settings['LoginRadius_emailVerificationOption']) && $this->settings['LoginRadius_emailVerificationOption'] == 1) ? "checked" : ""; ?>  /> <?php echo JText::_('COM_SOCIALLOGIN_OPTIONAL_EMAIL_VERIFICATION'); ?>                    
                 </label>
                 <label for="emailVerification-disabled">
-                    <input onchange="showAndHideUI();" class="emailVerificationOptions" id="emailVerification-disabled" style="margin:0" type="radio" name="settings[LoginRadius_emailVerificationOption]" value="2" <?php echo(!isset($this->settings['LoginRadius_emailVerificationOption']) || $this->settings['LoginRadius_emailVerificationOption'] == 2) ? "checked" : ""; ?>  /> <?php echo JText::_('COM_SOCIALLOGIN_DISABLED_EMAIL_VERIFICATION'); ?>                    
+                    <input onchange="showAndHideUI();" class="emailVerificationOptions" id="emailVerification-disabled" style="margin:0" type="radio" name="settings[LoginRadius_emailVerificationOption]" value="2" <?php echo(isset($this->settings['LoginRadius_emailVerificationOption']) && $this->settings['LoginRadius_emailVerificationOption'] == 2) ? "checked" : ""; ?>  /> <?php echo JText::_('COM_SOCIALLOGIN_DISABLED_EMAIL_VERIFICATION'); ?>                    
                 </label>
             </td>
         </tr>
@@ -176,22 +180,23 @@ if ($this->settings['updateuserdata'] == '1')
                 </label>
             </td>
         </tr>
-    </table>  
+    </table> 
     <table class="form-table sociallogin_table">
-        <tr>
-            <th class="head" colspan="2"><?php echo JText::_('COM_SOCIALLOGIN_DEBUG_SETTING'); ?></th>
-        </tr>
-        <tr >
-            <td colspan="2"><span class="sociallogin_subhead"><?php echo JText::_('COM_SOCIALLOGIN_DEBUG_ENABLE'); ?></span>
-                <br/><br />
-                <label for="debugEnable-yes">
-                    <input id="debugEnable-yes" style="margin:0" type="radio" name="settings[debugEnable]" value="1" <?php echo(isset($this->settings['debugEnable']) && $this->settings['debugEnable'] == 1) ? "checked" : ""; ?> /> <?php echo JText::_('COM_SOCIALLOGIN_DEBUG_ENABLE_YES'); ?>
-                </label>
-                <label for="debugEnable-no">
-                    <input id="debugEnable-no" style="margin:0" type="radio" name="settings[debugEnable]" value="0" <?php echo(!isset($this->settings['debugEnable']) || $this->settings['debugEnable'] == 0) ? "checked" : ""; ?>  /> <?php echo JText::_('COM_SOCIALLOGIN_DEBUG_ENABLE_NO'); ?>                    
-                </label>
+            <tr>
+                <th class="head" colspan="2"><?php echo JText::_('COM_SOCIALLOGIN_DEBUG_SETTING'); ?></th>
+            </tr>
+            <tr>
+                <td colspan="2"><span class="sociallogin_subhead"><?php echo JText::_('COM_SOCIALLOGIN_DEBUG_ENABLE'); ?></span>
+                    <br/><br />
+                    <label for="debugEnable-yes">
+                        <input id="debugEnable-yes" style="margin:0" type="radio" name="settings[debugEnable]" value="1" <?php echo(isset($this->settings['debugEnable']) && $this->settings['debugEnable'] == 1) ? "checked" : ""; ?> /> <?php echo JText::_('COM_SOCIALLOGIN_DEBUG_ENABLE_YES'); ?>
+                    </label>
+                    <label for="debugEnable-no">
+                        <input id="debugEnable-no" style="margin:0" type="radio" name="settings[debugEnable]" value="0" <?php echo(!isset($this->settings['debugEnable']) || $this->settings['debugEnable'] == 0) ? "checked" : ""; ?>  /> <?php echo JText::_('COM_SOCIALLOGIN_DEBUG_ENABLE_NO'); ?>                    
+                    </label>
 
-            </td>
-        </tr>
-    </table>
+                </td>
+            </tr>
+        </table>
+    <?php }?>
 </div>

@@ -79,7 +79,7 @@ class UserRegistrationAndManagementHelperRoute {
 
             $document->addScript('//hub.loginradius.com/include/js/LoginRadius.js');
             $document->addScript('//cdn.loginradius.com/hub/prod/js/LoginRadiusRaaS.js');
-            $document->addScript(JURI::root() . 'components/com_userregistrationandmanagement/assets/js/LoginRadiusFrontEnd.js');
+            $document->addScript(JURI::root() . 'components/com_userregistrationandmanagement/assets/js/LoginRadiusFrontEnd.min.js');
             $loginFunction = '</script> <script type="text/html" id="loginradiuscustom_tmpl">
                   <# if(isLinked) { #>
                    <div class="lr-linked">
@@ -131,13 +131,19 @@ class UserRegistrationAndManagementHelperRoute {
         }
         return $settings;
     }
-
+   
     public static function change_password_custom_access() {
         $session = JFactory::getSession();
         $settings = UserRegistrationAndManagementHelperRoute::getSettings();
         $optionVal = isset($settings['LoginRadius_emailVerificationOption']) ? $settings['LoginRadius_emailVerificationOption'] : '';
-        if ($optionVal == '1' || $optionVal == '2') { 
+        if ($optionVal == '1') {
             if ($session->get('provider') == 'RAAS' || $session->get('emailVerified')) {
+                return TRUE;
+            } else {
+                return FALSE;
+            }
+        } else if ($optionVal == '2') {
+            if ($session->get('provider') == 'RAAS') {
                 return TRUE;
             } else {
                 return FALSE;

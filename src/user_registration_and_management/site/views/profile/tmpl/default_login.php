@@ -10,8 +10,7 @@ defined('_JEXEC') or die;
 $settings = UserRegistrationAndManagementHelperRoute::getSetting();
 if (!JFactory::getUser()->id) {
     ?>
-    <div class="messages" style="display:none">
-        <h2 class="element-invisible">Error message</h2>
+    <div class="messages" style="display:none">       
         <ul>
             <li class="messageinfo">
 
@@ -19,7 +18,23 @@ if (!JFactory::getUser()->id) {
             <div class="clear"></div>
         </ul>
     </div>
-    <label><?php echo isset($settings['lr_social_login_label_string']) && !empty($settings['lr_social_login_label_string']) ? $settings['lr_social_login_label_string'] : 'Login with Social Id'; ?></label>
+    <script>
+        jQuery(document).ready(function () {
+            initializeLoginRaasForm();
+            initializeSocialRegisterRaasForm();
+            var isClear = 1;
+            var formIntval;
+            setTimeout(show_birthdate_date_block, 1000);
+            formIntval = setInterval(function () {
+                jQuery('#lr-loading').hide();
+                if (isClear > 0) {
+                    clearInterval(formIntval);
+                }
+            }, 1000);
+        });
+    </script> 
+
+    <label><?php echo isset($settings['lr_social_login_label_string']) && !empty($settings['lr_social_login_label_string']) ? $settings['lr_social_login_label_string'] : ''; ?></label>
     <div>
         <script type="text/html" id="loginradiuscustom_tmpl">
             <div class="lr_icons_box">
@@ -34,6 +49,9 @@ if (!JFactory::getUser()->id) {
         </script>
         <div class="lr_singleglider_200 interfacecontainerdiv"></div>
         <div style="clear:both"></div>
+        <script>
+            callSocialInterface();
+        </script>
     </div>
     <div class="my-form-wrapper">
         <div id="login-container"></div>
@@ -58,22 +76,6 @@ if (!JFactory::getUser()->id) {
             </div>
         </div>
         <div id="resetpassword-container" style="display: none;"></div>
-    </div>
-    <script>
-        jQuery(document).ready(function () {
-            callSocialInterface();
-            initializeLoginRaasForm();
-            initializeSocialRegisterRaasForm();
-            var isClear = 1;
-            var formIntval;
-            setTimeout(show_birthdate_date_block, 1000);
-            formIntval = setInterval(function () {
-                jQuery('#lr-loading').hide();
-                if (isClear > 0) {
-                    clearInterval(formIntval);
-                }
-            }, 1000);
-        });
-    </script>
-<?php
+    </div>    
+    <?php
 }?>

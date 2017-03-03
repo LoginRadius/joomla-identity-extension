@@ -10,7 +10,7 @@
     margin: 0;
     padding: 10px 0 7px 3px;
 }
-.messageinfo{
+.messageinfo {
     list-style-type: none;
 }
 div.messages {
@@ -387,6 +387,6 @@ div.loginradius-raas-validation-message {
 #ui-datepicker-div{
     position: absolute !important;
 }
-#login-container input{
+#login-container input {
     width: auto;
 }

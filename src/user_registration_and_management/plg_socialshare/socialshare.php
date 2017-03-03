@@ -43,6 +43,8 @@ class plgContentSocialShare extends JPlugin
         $this->verticalScript = isset($settings['verticalScript']) ? json_decode($settings['verticalScript']) : '';
         $this->loadLanguage('plg_content_socialshare');
     }
+    
+    
 /**
      * 
      * @param type $form
@@ -116,7 +118,7 @@ class plgContentSocialShare extends JPlugin
 
         if ($share_enable && $this->sharevertical == '1') {
             $document = JFactory::getDocument();
-            $document->addScript(JURI::root(true) . '/plugins/content/socialshare/socialshare.js');
+            $document->addScript(JURI::root(true) . '/plugins/content/socialshare/socialshare.min.js');
             if ($this->verticalarticaltype == '1') {
                 $beforediv .= $this->verticalShareScript($article);
             } else if (is_array($this->verticalArticles)) {
@@ -205,7 +207,7 @@ class plgContentSocialShare extends JPlugin
      */
     private function horizontalShareScript($article) {
         $document = JFactory::getDocument();
-        $document->addScript(JURI::root(true) . '/plugins/content/socialshare/socialshare.js');
+        $document->addScript(JURI::root(true) . '/plugins/content/socialshare/socialshare.min.js');
 
         $pageTitle = isset($article->title) && !empty($article->title) ? (" data-share-title='" . $article->title . "'") : '';
         $articleSummary = '';

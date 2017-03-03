@@ -161,7 +161,7 @@ jQuery(document).ready(function(){
     var counterProvider = ['Facebook Like','Facebook Recommend','Facebook Send','Twitter Tweet','Pinterest Pin it','LinkedIn Share','StumbleUpon Badge','Reddit','Google+ +1','Google+ Share'];
     
     for (var i = 0; i < shareProvider.length; i++) {
-        var sharehdiv = '<div class="ossProviders"><label class="socialTitle" for="horizontalsharingid'+shareProvider[i].toLowerCase().replace(/\ /gi,'').replace(/\+/gi,'')+'"><input type="checkbox" onchange="ossHorizontalSharingLimit(this);ossHorizontalRearrangeProviderList(this);" id="horizontalsharingid'+shareProvider[i].toLowerCase().replace(/\ /gi,'').replace(/\+/gi,'')+'" value="'+shareProvider[i]+'" style="float: left !important;">'+shareProvider[i]+'</label> </div>';
+        var sharehdiv = '<div class="ossProviders" style="padding:5px !important;"><label class="socialTitle" for="horizontalsharingid'+shareProvider[i].toLowerCase().replace(/\ /gi,'').replace(/\+/gi,'')+'"><input type="checkbox" onchange="ossHorizontalSharingLimit(this);ossHorizontalRearrangeProviderList(this);" id="horizontalsharingid'+shareProvider[i].toLowerCase().replace(/\ /gi,'').replace(/\+/gi,'')+'" value="'+shareProvider[i]+'" style="float: left !important;">'+shareProvider[i]+'</label> </div>';
         jQuery("#sharehprovider").append(sharehdiv);
 
         var sharevdiv = '<div class="ossProviders"><label class="socialTitle" for="verticalsharingid'+shareProvider[i].toLowerCase().replace(/\ /gi,'').replace(/\+/gi,'')+'"><input type="checkbox" onchange="ossVerticalSharingLimit(this);ossVerticalRearrangeProviderList(this);" id="verticalsharingid'+shareProvider[i].toLowerCase().replace(/\ /gi,'').replace(/\+/gi,'')+'" value="'+shareProvider[i]+'" style="float: left !important;">'+shareProvider[i]+'</label> </div>';
@@ -169,7 +169,7 @@ jQuery(document).ready(function(){
 
     }
     for (var i = 0; i < counterProvider.length; i++) {
-        var counterhdiv = '<div class="ossCounterProviders"><label class="socialTitle" for="horizontalcounterid'+counterProvider[i].toLowerCase().replace(/\ /gi,'').replace(/\+/gi,'')+'"><input type="checkbox" id="horizontalcounterid'+counterProvider[i].toLowerCase().replace(/\ /gi,'').replace(/\+/gi,'')+'" value="'+counterProvider[i]+'" name="horizontalcounter[]" style="float: left !important;">'+counterProvider[i]+'</label> </div>';
+        var counterhdiv = '<div class="ossCounterProviders" style="padding:5px !important;"><label class="socialTitle" for="horizontalcounterid'+counterProvider[i].toLowerCase().replace(/\ /gi,'').replace(/\+/gi,'')+'"><input type="checkbox" id="horizontalcounterid'+counterProvider[i].toLowerCase().replace(/\ /gi,'').replace(/\+/gi,'')+'" value="'+counterProvider[i]+'" name="horizontalcounter[]" style="float: left !important;">'+counterProvider[i]+'</label> </div>';
         jQuery("#counterhprovider").append(counterhdiv);
 
         var countervdiv = '<div class="ossProviders"><label class="socialTitle" for="verticalcounterid'+counterProvider[i].toLowerCase().replace(/\ /gi,'').replace(/\+/gi,'')+'"><input type="checkbox" id="verticalcounterid'+counterProvider[i].toLowerCase().replace(/\ /gi,'').replace(/\+/gi,'')+'" value="'+counterProvider[i]+'" name="verticalcounter[]" style="float: left !important;">'+counterProvider[i]+'</label> </div>';

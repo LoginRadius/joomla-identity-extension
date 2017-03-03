@@ -12,7 +12,16 @@ $showPassword = UserRegistrationAndManagementHelperRoute::change_password_custom
 <div class="profile <?php echo $this->pageclass_sfx ?>">
     <?php if (JFactory::getUser()->id == $this->data->id)
     {
-        ?>
+    global $lr_message;
+    $lrmessage = JRequest::getVar('lr-message');
+    if ($lr_message !== false && isset($lrmessage) && $lrmessage == 'linkingsuccess') {
+        $lr_message = false;
+        $mainframe = JFactory::getApplication();
+        $mainframe->enqueueMessage(JText::_('COM_SOCIALLOGIN_ADD_ID'), 'message');
+        $mainframe->redirect(JRoute::_('index.php?option=com_userregistrationandmanagement&view=profile'));
+        exit();
+    }
+?>
         <ul class="btn-toolbar pull-right"> 
             <?php if($showPassword){?>
             <li class="btn-group">

@@ -16,36 +16,36 @@ dt.tabs h3 {
     margin-left: 2px;
     border-bottom: 0px;
     background: #fff;
-    font-size:12px;
+    font-size: 12px;
 }
 div.current {
     clear: both;
 }
 .help_ul {
-    margin:0 0 15px 25px;
-    padding:0px;
-    float:left;
-    list-style:circle;
+    margin: 0 0 15px 25px;
+    padding: 0px;
+    float: left;
+    list-style: circle;
 }
 .help_ul li a {
-    font-family:Arial, Helvetica, sans-serif;
-    font-size:12px;
-    color:#000000;
-    line-height:160%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: #000000;
+    line-height: 160%;
 }
 .stay_ul {
-    margin:0 0 15px 10px;
-    padding:0px;
-    float:left;
-    list-style:none;
+    margin: 0 0 15px 10px;
+    padding: 0px;
+    float: left;
+    list-style: none;
 }
 .stay_ul li {
-    line-height:160%;
-    float:left;
-    margin:0 10px 0 0;
+    line-height: 160%;
+    float: left;
+    margin: 0 10px 0 0;
 }
 .sociallogin_table .sociallogin_subhead {
-    font-weight: bold ;
+    font-weight: bold;
     font-size: 13px ;
     font-weight: bold ;
 }
@@ -78,7 +78,7 @@ div.current {
     font-size: 14px;
     font-weight: bold;
     margin-top: 15px;
-    color:#00ccff;
+    color: #00ccff;
 }
 .sociallogin_form .sociallogin_row_button {
     background-color: #F6F6F6;
@@ -89,7 +89,7 @@ div.current {
 .sociallogin_form .sociallogin_row_description {
     padding: 5px 0 10px 10px;
     font-weight: bold;
-    color:#00ccff;
+    color: #00ccff;
 }
 .sociallogin_form_main {
     background-color: #EAF7FF;
@@ -175,7 +175,26 @@ div.current {
     font-weight: normal;
     text-shadow: 0 1px 0 #FFFFFF;
 }
-table img{
+.sociallogin_table table img {
     max-width: 50px;
     max-height: 50px;
+}
+
+a {
+  color: #0254EB  
+}
+a:visited {
+  color: #0254EB  
+}
+a.morelink {
+  text-decoration:none;
+  outline: none;
+}
+.morecontent span {
+  display: none;
+}
+.comment {
+  width: 400px;
+  background-color: #f0f0f0  ;
+  margin: 10px;
 }

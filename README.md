@@ -1,4 +1,4 @@
-# LoginRadius Joomla Identity Extension for 3.X
+# LoginRadius Joomla Identity Extension for 2.x and 3.X
 
 
 ![Home Image](https://d2lvlj7xfpldmj.cloudfront.net/support/github/banner-1544x500.png)

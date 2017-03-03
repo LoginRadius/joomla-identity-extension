@@ -9,12 +9,23 @@
 defined('_JEXEC') or die;
 
 JHtml::_('behavior.keepalive');
-JHtml::_('behavior.tooltip');
+//JHtml::_('behavior.tooltip');
 JHtml::_('behavior.formvalidation');
 JHtml::_('behavior.noframes');
 //load user_profile plugin language
 $lang = JFactory::getLanguage();
 $lang->load('plg_user_profile', JPATH_ADMINISTRATOR);
+
+$db = JFactory::getDbo();
+$query = $db->getQuery(true);
+$query
+    ->select(array('u.name'))
+    ->from($db->quoteName('#__users', 'u'))   
+    ->where($db->quoteName('u.id') . " = " . $db->quote(JFactory::getUser()->id));
+
+$db->setQuery($query);
+$name = $db->loadResult();
+
 ?>
 <div class="profile-edit<?php echo $this->pageclass_sfx ?>">
     <?php
@@ -35,7 +46,7 @@ $lang->load('plg_user_profile', JPATH_ADMINISTRATOR);
                     </label>                            
                 </div>
                 <div class="controls">
-                    <input type="text" name="jform[name]" id="jform_name" value="<?php echo JFactory::getUser()->name;?>" class="required" size="30" required="required" aria-required="true" aria-invalid="false">              
+                    <input type="text" name="jform[name]" id="jform_name" value="<?php echo $name;?>" class="required" size="30" required="required" aria-required="true" aria-invalid="false">              
                 </div>
             </div>
             <div class="control-group">

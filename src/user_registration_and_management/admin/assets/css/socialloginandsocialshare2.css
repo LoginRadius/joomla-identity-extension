@@ -4,7 +4,7 @@
     border: #dddddd 1px solid;
 }
 
-.loginRadiusProviders{
+.loginRadiusProviders {
     width: 162px;
     float: left;
 }
@@ -12,16 +12,24 @@
     width: 162px;
     float: left;
 }
-.socialTitle{
+.socialTitle {
     clear: none !important;
     margin: 5px !important;
-    float:none !important;
-    display:inline !important;
+    float: none !important;
+    display: inline !important;
 }
 
+#sharehorizontal label {
+    width: 460px;
+    max-width: 460px;
+}
 
 .imagehori {
-    margin-top:15px;
+    margin-top: 15px;
+}
+
+.tabs a:hover,.tabs a:active ,.tabs a{ 
+   text-decoration: none !important;
 }
 
 #horsortable,
@@ -32,14 +40,14 @@
 }
 
 #horsortable li,
-#versortable li{
-    float:left !important;
+#versortable li {
+    float: left !important;
 }
 
 .ossProviders, .ossCounterProviders {
     width: 22%;
     float: left;
-    padding: 0px;
+    padding: 5px;
 }
 #sharevertical label {
     margin-right: 10px;
@@ -48,63 +56,70 @@
 }
 dt.tabs h3 {
     float: left;
-    margin-right: 0px;
+    margin-right: 0px !important;
     border: #CCC 1px solid;
-    padding: 9px;
-    margin-bottom: 0px;
-    margin-left: 2px;
+    padding: 4px !important;
+    margin-bottom: 0px !important;
+    margin-left: -3px !important;
     border-bottom: 0px;
-    background: #fff;
-    font-size : 17px !important;   
+    border: 0px;
+    font-size: 12px !important;
 }
 
+dt.open h3{
+    background: transparent !important;   
+}
+
+dl.tabs dt a {
+  color: #025A8D !important;  
+}
 
 div.current input, div.current textarea, div.current select {
     float: none !important;
 }
 .help_ul {
-    margin:0 0 15px 25px;
-    padding:0px;
-    float:left;
-    list-style:circle;
+    margin: 0 0 15px 25px;
+    padding: 0px;
+    float: left;
+    list-style: circle;
 }
 .help_ul li a {
-    font-family:Arial, Helvetica, sans-serif;
-    font-size:12px;
-    line-height:160%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    line-height: 160%;
 }
 .stay_ul {
-    margin:0 0 15px 10px;
-    padding:0px;
-    float:left;
-    list-style:none;
+    margin: 0 0 15px 10px;
+    padding: 0px;
+    float: left;
+    list-style: none;
 }
 .stay_ul li {
-    line-height:160%;
-    float:left;
-    margin:0 10px 0 0;
+    line-height: 160%;
+    float: left;
+    margin: 0 10px 0 0;
 }
 #Error {
     background-image: url("../img/error.png");
-    background-repeat:no-repeat;
-    background-position:left; 
-    color:#FF0000; 
-    height:20px; 
+    background-repeat: no-repeat;
+    background-position: left; 
+    color: #FF0000; 
+    height: 20px; 
     padding: 4px 2px 2px 30px;
     background-color: #FEF5F1;
     border: 1px solid #ED541D;
 }
 #loading {
     background-image: url("../img/loading.gif");
-    background-repeat:no-repeat;
+    background-repeat: no-repeat;
     padding: 0px 2px 0px 30px;	
 }
 #Success {
     background-image: url("../img/ok.png");
-    background-repeat:no-repeat;
-    background-position:left; 
-    color:#669933; 
-    height:20px; 
+    background-repeat: no-repeat;
+    background-position: left; 
+    color: #669933; 
+    height: 20px; 
     padding: 4px 2px 2px 30px;
     background-color: #EAFFDC;
     border: 1px solid #60CF4E;
@@ -138,7 +153,7 @@ div.current input, div.current textarea, div.current select {
     font-size: 14px;
     font-weight: bold;
     margin-top: 15px;
-    color:#00ccff;
+    color: #00ccff;
 }
 .sociallogin_form .sociallogin_row_button {
     background-color: #F6F6F6;
@@ -149,7 +164,7 @@ div.current input, div.current textarea, div.current select {
 .sociallogin_form .sociallogin_row_description {
     padding: 5px 0 10px 10px;
     font-weight: bold;
-    color:#00ccff;
+    color: #00ccff;
 }
 .sociallogin_form_main {
     background-color: #EAF7FF;
@@ -270,65 +285,69 @@ div.current input, div.current textarea, div.current select {
     margin-top: -27px !important;
 }
 
-#sharehorizontal label {
-    width: 70% !important;
-    max-width: 70% !important;
+#sharehorizontal label input#responcive {
+    vertical-align: middle;
+    margin-top: -27px !important;
 }
 
-.section70{
-    float:left;
-    width:70%;
+#sharehorizontal label img {
+    margin-left: 10px;
 }
-.section30{
-    float:right;
-    width:29%;
+
+.section70 {
+    float: left;
+    width: 70%;
 }
-.socialBox{
-    background:#EAF7FF;
+.section30 {
+    float: right;
+    width: 29%;
+}
+.socialBox {
+    background: #EAF7FF;
     border: 1px solid #B3E2FF;
-    overflow:auto;
-    margin:0 0 10px 0;
+    overflow: auto;
+    margin: 0 0 10px 0;
 }
-.section70 .welcome{
+.section70 .welcome {
     background: #EAF7FF;
     overflow: auto;
     margin: 0px 10px;
     border-bottom: 1px solid #B3E2FF;
 }
 
-.socialBox h3{
-    padding:8px 0px 8px 0px;
+.socialBox h3 {
+    padding: 8px 0px 8px 0px;
     border-bottom: 1px solid #B3E2FF;
     color: #000000; 
-    margin:10px;
+    margin: 10px;
 }
-.socialBox p{
+.socialBox p {
     line-height: 19px;
-    font-size:12px !important;
-    margin:10px !important;
+    font-size: 12px !important;
+    margin: 10px !important;
     text-align: justify;
 }
-.section70 fieldset{
-    background:#EAF7FF; 
+.section70 fieldset {
+    background: #EAF7FF; 
     border: 1px solid #B3E2FF;
 }
-.section70 .welcome_text{
-    width:90%; 
-    line-height:160%;
+.section70 .welcome_text {
+    width: 90%; 
+    line-height: 160%;
 }
-.section70 .btn-small{
+.section70 .btn-small {
     margin: 10px;
 }
 #welcomeEmailText,
 #activationEmailText,
-#adminActivationEmailText{
+#adminActivationEmailText {
     width: 99%
 }
-input[type="text"]{
+input[type="text"] {
     width: 300px;
     padding: 5px;
 }
-textarea{
+textarea {
     width: 305px;
 }
 .ossshare_iconsprite32 {
@@ -417,7 +436,7 @@ textarea{
 
 #welcomeEmailSubject,
 #adminActivationEmailSubject,
-#activationEmailSubject{
+#activationEmailSubject {
     clear: both !important;
     float: left !important;
 }

@@ -32,9 +32,9 @@ class UserRegistrationAndManagementViewUserRegistrationAndManagement extends JVi
         if (JVERSION < 3) {
             $version = '2';
         }
-        $document->addStyleSheet('components/com_userregistrationandmanagement/assets/css/socialloginandsocialshare' . $version . '.css');
+        $document->addStyleSheet('components/com_userregistrationandmanagement/assets/css/socialloginandsocialshare' . $version . '.min.css');
         $document->addScript('//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js');
-        $document->addScript('components/com_userregistrationandmanagement/assets/js/userregistrationandmanagement.js');
+        $document->addScript('components/com_userregistrationandmanagement/assets/js/userregistrationandmanagement.min.js');
         $this->form = $this->get('Form');
         $this->addToolbar();
 

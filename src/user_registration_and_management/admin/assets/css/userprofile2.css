@@ -175,7 +175,25 @@ div.current {
     font-weight: normal;
     text-shadow: 0 1px 0 #FFFFFF;
 }
-table th img{
-    max-height: 50px;
+.sociallogin_table table img {
     max-width: 50px;
+    max-height: 50px;
+}
+a {
+  color: #0254EB  
+}
+a:visited {
+  color: #0254EB  
+}
+a.morelink {
+  text-decoration:none;
+  outline: none;
+}
+.morecontent span {
+  display: none;
+}
+.comment {
+  width: 400px;
+  background-color: #f0f0f0  ;
+  margin: 10px;
 }

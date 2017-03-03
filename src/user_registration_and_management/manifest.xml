@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="component" version="5.0" method="upgrade">
+<extension type="component" version="5.0.1" method="upgrade">
     <name>User Registration and Management</name>
     <license>Open Source License, GPL v2 based</license>
     <author>LoginRadius</author>
     <authorEmail>developers@loginradius.com</authorEmail>
     <authorUrl>http://www.loginradius.com</authorUrl>
-    <creationDate>2016-01-01</creationDate>
-    <copyright>2016, LoginRadius</copyright>
-    <version>5.0</version>
+    <creationDate>2017-01-01</creationDate>
+    <copyright>2017, LoginRadius</copyright>
+    <version>5.0.1</version>
     <description>LoginRadius enables user registration for your joomla websites.</description>
 
     <!-- Installation -->	
@@ -53,6 +53,7 @@
             <menu view="userregistrationandmanagement">COM_USERREGISTRATIONANDMANAGEMENT</menu>
             <menu view="socialsharing">COM_LOGINRADIUS_SOCIAL_SHARING</menu>
             <menu view="usermanager">COM_LOGINRADIUS_USERMANAGER</menu>
+            <menu view="apilog">COM_LOGINRADIUS_APILOG</menu>
         </submenu>
         <files folder="admin">
             <folder>assets</folder>
@@ -95,11 +96,13 @@
             <files folder="plg_userregistration">
                 <file plugin="userregistration">userregistration.php</file>
                 <file>userregistration.xml</file>
+                <file>customhttpclient.php</file>
                 <folder>css</folder>
                 <folder>js</folder>
                 <folder>helper</folder>
                 <folder>LoginRadiusSDK</folder>	
                 <file>index.html</file>
+                
             </files>
         </plugin>
         <plugin plugin="socialshare" title="Social Share Plugin" order="-100" group="content">
@@ -114,6 +117,20 @@
             <files folder="plg_singlesignon">
                 <file plugin="singlesignon">singlesignon.php</file>
                 <file>singlesignon.xml</file>
+                <file>index.html</file>			
+            </files>
+        </plugin>
+        <plugin plugin="socialprofiledata" title="Social Profile Data Plugin" order="-100" group="system">
+            <files folder="plg_socialprofiledata">
+                <file plugin="socialprofiledata">socialprofiledata.php</file>
+                <file>socialprofiledata.xml</file>
+                <file>index.html</file>			
+            </files>
+        </plugin>
+        <plugin plugin="hostedpage" title="Hosted Page Plugin" order="-100" group="system">
+            <files folder="plg_hostedpage">
+                <file plugin="hostedpage">hostedpage.php</file>
+                <file>hostedpage.xml</file>
                 <file>index.html</file>			
             </files>
         </plugin>

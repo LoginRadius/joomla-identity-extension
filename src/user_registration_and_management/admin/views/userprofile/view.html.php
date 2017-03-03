@@ -25,7 +25,7 @@ class UserRegistrationAndManagementViewUserProfile extends JViewLegacy {
         if (JVERSION < 3) {
             $version = '2';
         }
-        $document->addStyleSheet('components/com_userregistrationandmanagement/assets/css/userprofile' . $version . '.css');
+        $document->addStyleSheet('components/com_userregistrationandmanagement/assets/css/userprofile' . $version . '.min.css');
         
         $model = $this->getModel();
         $userid = JRequest::getVar('userid');

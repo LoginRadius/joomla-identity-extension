@@ -24,28 +24,54 @@ class UserRegistrationAndManagementController extends LRController {
     public function display($cachable = false, $urlparams = false) {
         // Get the document object.
         $document = JFactory::getDocument();
+        $settings = $this->getSettings();
+
         // Set the default view name and format from the Request.   
 
         $vFormat = $document->getType();
         $vName = JRequest::getVar('view', 'login');
         preg_match("/[^\/]+$/", JUri::current(), $matches);
         $pagename = $matches[0];
-        if (in_array($pagename, array('register', 'updateprofile', 'forgotpassword', 'changepassword', 'login', 'logout'))) {
+        if (in_array($pagename, array('register', 'profile', 'updateprofile', 'forgotpassword', 'changepassword', 'login', 'logout'))) {
             if (JFactory::getUser()->id != 0) {
-                if (in_array($pagename, array('updateprofile', 'changepassword', 'logout'))) {
-                    if ($pagename == 'logout') {
-                        $app = JFactory::getApplication();
-                        // Perform the log out.
-                        $error = $app->logout();
-                        $dispatcher = JEventDispatcher::getInstance();
-                        $dispatcher->trigger('onLoginRadiusSSOLogout', array($error));
+                if (in_array($pagename, array('updateprofile', 'profile', 'changepassword', 'logout'))) {
+                    if (isset($settings['enableHostedPage']) && $settings['enableHostedPage'] == 'true') {
+                        if (in_array($pagename, array('profile', 'changepassword', 'logout'))) {
+                            if (JVERSION < 3) {
+                                $dispatcher = JDispatcher::getInstance();
+                            } else {
+                                $dispatcher = JEventDispatcher::getInstance();
+                            }
+                            $dispatcher->trigger('lrHostedPageInitialise', array($pagename));
+                        }
+                    } else {
+                        if ($pagename == 'logout') {
+                            $app = JFactory::getApplication();
+                            // Perform the log out.
+                            $error = $app->logout();
+                            if (JVERSION < 3) {
+                                $dispatcher = JDispatcher::getInstance();
+                            } else {
+                                $dispatcher = JEventDispatcher::getInstance();
+                            }
+                            $dispatcher->trigger('onLoginRadiusSSOLogout', array($error));
+                        }
+                        $lName = JRequest::getVar('layout', 'default_' . $pagename);
                     }
-                    $lName = JRequest::getVar('layout', 'default_' . $pagename);
                 } else {
                     $this->setRedirect(JRoute::_('index.php?option=com_userregistrationandmanagement&view=profile', false));
                 }
             } else {
-                $lName = JRequest::getVar('layout', 'default_' . $pagename);
+                if (isset($settings['enableHostedPage']) && $settings['enableHostedPage'] == 'true') {
+                    if (JVERSION < 3) {
+                        $dispatcher = JDispatcher::getInstance();
+                    } else {
+                        $dispatcher = JEventDispatcher::getInstance();
+                    }
+                    $dispatcher->trigger('lrHostedPageInitialise', array($pagename));
+                } else {
+                    $lName = JRequest::getVar('layout', 'default_' . $pagename);
+                }
             }
         } else {
             if (JFactory::getUser()->id) {
@@ -83,6 +109,28 @@ class UserRegistrationAndManagementController extends LRController {
             $view->document = $document;
             $view->display();
         }
+    }
+
+    /**
+     * login radius get saved setting from db
+     * 
+     * @return array
+     */
+    private function getSettings() {
+        $db = JFactory:: getDBO();
+        $query = $db->getQuery(true);
+        $query->select('*')
+                ->from('#__loginradius_settings');
+        $db->setQuery($query);
+        $rows = $db->LoadAssocList();
+        $settings = array();
+
+        if (is_array($rows)) {
+            foreach ($rows AS $key => $data) {
+                $settings [$data['setting']] = $data['value'];
+            }
+        }
+        return $settings;
     }
 
 }

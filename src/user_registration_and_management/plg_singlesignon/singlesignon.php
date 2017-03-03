@@ -28,16 +28,18 @@ class plgSystemSingleSignOn extends JPlugin {
     public function onLoginRadiusSSOLogout($error) {
         return $this->singleSignOnScript(true);
     }
-
+  
     /**
      * social9 get saved setting from db
      * 
      * @return array
      */
     private function getSettings() {
-        $db = JFactory:: getDBO();
-        $sql = "SELECT * FROM #__loginradius_settings";
-        $db->setQuery($sql);
+        $db = JFactory:: getDBO();        
+        $query = $db->getQuery(true);
+        $query->select('*')
+                ->from('#__loginradius_settings');         
+        $db->setQuery($query);
         $rows = $db->LoadAssocList();
         $settings = array();
 
@@ -46,7 +48,6 @@ class plgSystemSingleSignOn extends JPlugin {
                 $settings [$data['setting']] = $data['value'];
             }
         }
-
         return $settings;
     }
 
@@ -94,5 +95,4 @@ class plgSystemSingleSignOn extends JPlugin {
             $document->addScriptDeclaration($loginFunction);
         }
     }
-
 }

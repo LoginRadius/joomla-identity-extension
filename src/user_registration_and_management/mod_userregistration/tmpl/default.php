@@ -11,7 +11,7 @@ if (!defined('LRDS')) {
     define('LRDS', '/');
 }
 JHtml::_('behavior.keepalive');
-JHtml::_('bootstrap.tooltip');
+//JHtml::_('bootstrap.tooltip');
 
 if (!JFactory::getUser()->id) {
     ?>

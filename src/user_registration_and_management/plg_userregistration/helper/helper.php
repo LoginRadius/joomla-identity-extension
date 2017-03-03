@@ -60,7 +60,7 @@ class plgSystemUserRegistrationTools {
 
         $msgTitle = str_replace('@provider', $profileData->Provider, $msgTitle);
         $msg = str_replace('@provider', $profileData->Provider, $msg);
-        $document->addStyleSheet(JURI::root() . 'plugins/system/userregistration/css/popupstyle.css');
+        $document->addStyleSheet(JURI::root() . 'plugins/system/userregistration/css/popupstyle.min.css');
 
         $output = '<div class="socialoverlay">';
         $output .= '<div id="popupouter"><form method="post" action=""><div class="socialpopupheading"> ' . $msgTitle . '</div>';
@@ -233,11 +233,11 @@ class plgSystemUserRegistrationTools {
      */
     public static function getSettings() {
         $settings = array();
-
         $db = JFactory::getDBO();
-
-        $sql = "SELECT * FROM #__loginradius_settings";
-        $db->setQuery($sql);
+        $query = $db->getQuery(true);
+        $query->select('*')
+                ->from('#__loginradius_settings');
+        $db->setQuery($query);
         $rows = $db->LoadAssocList();
 
         if (is_array($rows)) {
@@ -256,13 +256,12 @@ class plgSystemUserRegistrationTools {
      */
     public static function getAdvanceSettings() {
         $settings = array();
-
         $db = JFactory::getDBO();
-
-        $sql = "SELECT * FROM #__loginradius_advanced_settings";
-        $db->setQuery($sql);
+        $query = $db->getQuery(true);
+        $query->select('*')
+                ->from('#__loginradius_advanced_settings');
+        $db->setQuery($query);
         $rows = $db->LoadAssocList();
-
         if (is_array($rows)) {
             foreach ($rows AS $key => $data) {
                 $settings [$data['setting']] = $data ['value'];
@@ -292,14 +291,94 @@ class plgSystemUserRegistrationTools {
      */
     public static function loginExistUser($userId, $profileDataObject, $accessToken, $newUser) {
         $settings = self::getSettings();
+        $username = self::lr_social_login_username_option($settings, $profileDataObject);  
+        $db = JFactory::getDbo();
+            $query = $db->getQuery(true);
+            $query
+                    ->select(array('u.username', 'u.id'))
+                    ->from($db->quoteName('#__users', 'u'))
+                    ->join('LEFT', $db->quoteName('#__loginradius_users', 'lu') . ' ON (' . $db->quoteName('lu.id') . ' = ' . $db->quoteName('u.id') . ')')
+                    ->where($db->quoteName('lu.Uid') . " = " . $db->quote($profileDataObject->Uid));
+            $db->setQuery($query);
+            $userdata = $db->loadObjectList();
+        if (isset($username['username']) && $username['username'] != '') {            
+            if (isset($userdata) && !empty($userdata)) {
+                if ($userdata[0]->username != $username['username']) {
+                    $query = $db->getQuery(true);
+                    $fields = array(
+                        $db->quoteName('username') . ' = ' . $db->quote($username['username'])
+                    );
+                    $conditions = array(
+                        $db->quoteName('id') . ' = ' . $db->quote($userdata[0]->id)
+                    );
+
+                    $query->update($db->quoteName('#__users'))->set($fields)->where($conditions);
+                    $db->setQuery($query);
+                    $db->execute();
+                }
+            }
+        } else {
+    
+            if (isset($username['raasProviderId']) && $username['raasProviderId'] != '') {   
+            try {
+                $apiKey = trim($settings['apikey']);
+                $apiSecret = trim($settings['apisecret']);
+                $UserObj = new LoginRadiusSDK\CustomerRegistration\UserAPI($apiKey, $apiSecret, array('output_format' => 'json'));
+                 $data = array(
+                    'UserName' => $userdata[0]->username,
+                     );
+                $UserObj->edit($username['raasProviderId'],$data);
+        
+                
+            } catch (LoginRadiusException $e) {               
+             }}
+        }
         plgSystemUserRegistrationPostMessage::socialPost($profileDataObject->Provider, $accessToken);
-        if ($settings['updateuserdata'] == 1 || $newUser) {
+        if ($settings['updateuserdata'] == '1' && !$newUser) {
             plgSystemUserRegistrationTools::updateUserProfile($userId, $profileDataObject, $accessToken);
         }
-        if (plgSystemUserRegistrationSendMessage::friendInvatePopupController($profileDataObject->Provider, $accessToken)) {
+            
+        if (plgSystemUserRegistrationSendMessage::friendInvitePopupController($profileDataObject->Provider, $accessToken)) {
+         
             plgSystemUserRegistrationSendMessage::sendMessageToAllContacts($profileDataObject->Provider, $accessToken);
             self::userLogin($userId, $profileDataObject, $newUser);
         }
+    }
+
+    public static function lr_social_login_username_option($settings, $userprofile) {
+        $enableUname = isset($settings['LoginRadius_enableLoginWithUsername']) ? $settings['LoginRadius_enableLoginWithUsername'] : '';
+        $emailVerifyOption = isset($settings['LoginRadius_emailVerificationOption']) ? $settings['LoginRadius_emailVerificationOption'] : '';
+        
+        if (isset($emailVerifyOption) && $emailVerifyOption == '1') {
+            $enableUname = 'false';
+        }    
+        if (isset($enableUname) && $enableUname == 'true') {
+            try {
+                $apiKey = trim($settings['apikey']);
+                $apiSecret = trim($settings['apisecret']);
+                $accountObj = new LoginRadiusSDK\CustomerRegistration\AccountAPI($apiKey, $apiSecret, array('output_format' => 'json'));
+
+                $returndata = $accountObj->getAccounts($userprofile->Uid);
+                $username = '';
+                $raasProviderId = '';
+                foreach ($returndata as $key => $value) {
+                    if ($value->Provider == 'RAAS' && $value->UserName != '') {
+                        $username = $value->UserName;                        
+                    } if($value->Provider == 'RAAS' && $value->ID != ''){
+                        $raasProviderId = $value->ID;
+                    }
+                }
+            } catch (LoginRadiusException $e) {
+                if (isset($e->getErrorResponse()->message) && $e->getErrorResponse()->message) {
+                    $mainframe->enqueueMessage($e->getErrorResponse()->message, 'error');
+                }
+            }
+              return  $username = array(
+                'username' => $username,
+                'raasProviderId' => $raasProviderId                
+              );
+        }
+     
     }
 
     /**
@@ -319,7 +398,11 @@ class plgSystemUserRegistrationTools {
         }
         // Register session variables
         $session = JFactory::getSession();
-        $query = "SELECT Uid,lr_picture from #__loginradius_users WHERE LoginRadius_id=" . $db->Quote($userProfile->ID) . " AND id = " . $user->get('id');
+        $query = $db->getQuery(true);
+        $query->select('Uid, lr_picture')
+                ->from('#__loginradius_users')
+                ->where($db->quoteName('LoginRadius_id') . " = " . $db->quote($userProfile->ID) . " AND " . $db->quoteName('id') . " = " . $db->quote($user->get('id')));
+
         $db->setQuery($query);
         $getUserData = $db->loadObjectList();
 
@@ -370,14 +453,20 @@ class plgSystemUserRegistrationTools {
         }
         if ($redirection) {
             if ($router->getMode() == JROUTER_MODE_SEF) {
-                $query = "SELECT path FROM #__menu WHERE id = " . $db->Quote($redirection);
+                $query = $db->getQuery(true);
+                $query->select('path')
+                        ->from('#__menu')
+                        ->where($db->quoteName('id') . " = " . $db->quote($redirection));
                 $db->setQuery($query);
                 $url = $db->loadResult();
                 if ($checkRewrite == '0' AND ! empty($url)) {
                     $url = 'index.php/' . $url;
                 }
             } else {
-                $query = "SELECT link FROM #__menu WHERE id = " . $db->Quote($redirection);
+                $query = $db->getQuery(true);
+                $query->select('link')
+                        ->from('#__menu')
+                        ->where($db->quoteName('id') . " = " . $db->quote($redirection));
                 $db->setQuery($query);
                 $url = $db->loadResult();
             }
@@ -394,13 +483,23 @@ class plgSystemUserRegistrationTools {
                     $item = $menu->getItem($itemId);
                     unset($vars['Itemid']);
                     if (isset($item) && $vars == $item->query) {
-                        $query = "SELECT path FROM #__menu WHERE id = " . $db->Quote($itemId) . " AND home = 1";
+
+                        $query = $db->getQuery(true);
+                        $query->select('path')
+                                ->from('#__menu')
+                                ->where($db->quoteName('id') . " = " . $db->quote($itemId) . " AND " . $db->quoteName('home') . " = " . $db->quote('1'));
+
+
                         $db->setQuery($query);
                         $homeUrl = $db->loadResult();
                         if ($homeUrl) {
                             $url = 'index.php';
                         } else {
-                            $query = "SELECT path FROM #__menu WHERE id = " . $db->Quote($itemId);
+                            $query = $db->getQuery(true);
+                            $query->select('path')
+                                    ->from('#__menu')
+                                    ->where($db->quoteName('id') . " = " . $db->quote($itemId));
+
                             $db->setQuery($query);
                             $url = $db->loadResult();
                             if ($checkRewrite == '0' AND ! empty($url)) {
@@ -417,16 +516,20 @@ class plgSystemUserRegistrationTools {
                     $url = $articlePath;
                 }
             } else {
-                $fullUrl = urldecode($_SERVER['HTTP_REFERER']);
+                $jinput = JFactory::getApplication()->input;
+                $http_referer = $jinput->server->get('HTTP_REFERER', '', '');
+                $query_string = $jinput->server->get('QUERY_STRING', '', '');
+
+                $fullUrl = urldecode($http_referer);
                 if (strpos($fullUrl, "callback=") > 0) {
                     $urlData = explode("callback=", $fullUrl);
                     $tampPos = strpos($urlData[1], "&");
                     $endLimit = strlen($urlData[1]);
                     if ($tampPos > 0) {
-                        if (strpos($_SERVER['QUERY_STRING'], '&') > 0) {
-                            $url = 'index.php?' . $_SERVER['QUERY_STRING'];
+                        if (strpos($query_string, '&') > 0) {
+                            $url = 'index.php?' . $query_string;
                         } else {
-                            $url = 'index.php?' . $_SERVER['QUERY_STRING'] . substr($urlData[1], $tampPos, $endLimit);
+                            $url = 'index.php?' . $query_string . substr($urlData[1], $tampPos, $endLimit);
                         }
                     }
                 }
@@ -444,29 +547,37 @@ class plgSystemUserRegistrationTools {
         $db = JFactory::getDbo();
         $session = JFactory::getSession();
         $mainframe = JFactory::getApplication();
-        $query = "SELECT provider from #__loginradius_users WHERE provider=" . $db->Quote($userProfile->Provider) . " AND id = " . JFactory::getUser()->id;
+        $query = $db->getQuery(true);
+        $query->select('provider')
+                ->from('#__loginradius_users')
+                ->where($db->quoteName('provider') . " = " . $db->quote($userProfile->Provider) . " AND " . $db->quoteName('id') . " = " . $db->quote(JFactory::getUser()->id));
+
         $db->setQuery($query);
         $checkProvider = $db->loadResult();
 
-        if (empty($checkProvider)) {
-            $settings = self::getSettings();
-            $raas_account = new LoginRadiusSDK\CustomerRegistration\AccountAPI($settings['apikey'], $settings['apisecret'], array('output_format' => 'json'));
-            try {
-                $result = $raas_account->accountLink($session->get('Uid'), $userProfile->ID, $userProfile->Provider);
-                if (isset($result->isPosted) && $result->isPosted) {
-                    $userProfile->Uid = $session->get('Uid');
-                    self::insertSocialData(JFactory::getUser()->id, $userProfile);
-                    $mainframe->redirect(JRoute::_('index.php?option=com_userregistrationandmanagement&view=profile'), JText::_('COM_SOCIALLOGIN_ADD_ID'), 'message');
-                } else {
-                    $mainframe->redirect(JRoute::_('index.php?option=com_userregistrationandmanagement&view=profile'), JText::_('COM_SOCIALLOGIN_EXIST_PROVIDER'), 'error');
+        $settings = self::getSettings();
+        $raas_account = new LoginRadiusSDK\CustomerRegistration\AccountAPI($settings['apikey'], $settings['apisecret'], array('output_format' => 'json'));
+        try {
+            $result = $raas_account->accountLink($session->get('Uid'), $userProfile->ID, $userProfile->Provider);
+            if (isset($result->isPosted) && $result->isPosted) {
+                $db = JFactory::getDbo();
+                $query = $db->getQuery(true);
+                $query->select('id')
+                        ->from('#__loginradius_users')
+                        ->where($db->quoteName('LoginRadius_id') . " = " . $db->quote($userProfile->ID));
+                $db->setQuery($query);
+                $exist_account = $db->loadResult();
+                if ($exist_account) {
+                    self::removeSocialData($userProfile->ID);
                 }
-            } catch (LoginRadiusException $e) {                
-                if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-                    $mainframe->redirect(JRoute::_('index.php?option=com_userregistrationandmanagement&view=profile'), $e->getErrorResponse()->description, 'error');
-                }
+                $userProfile->Uid = $session->get('Uid');
+                self::insertSocialData(JFactory::getUser()->id, $userProfile);
+                $mainframe->redirect(JRoute::_('index.php?option=com_userregistrationandmanagement&view=profile'), JText::_('COM_SOCIALLOGIN_ADD_ID'), 'message');
             }
-        } else {
-            $mainframe->redirect(JRoute::_('index.php?option=com_userregistrationandmanagement&view=profile'), JText::_('COM_SOCIALLOGIN_EXIST_PROVIDER'), 'error');
+        } catch (LoginRadiusException $e) {
+            if (isset($e->getErrorResponse()->message) && $e->getErrorResponse()->message) {
+                $mainframe->redirect(JRoute::_('index.php?option=com_userregistrationandmanagement&view=profile'), $e->getErrorResponse()->message, 'warning');
+            }
         }
     }
 
@@ -478,9 +589,30 @@ class plgSystemUserRegistrationTools {
      */
     public static function getUserIdByEmail($email) {
         $db = JFactory::getDbo();
-        $query = "SELECT id FROM #__users WHERE email=" . $db->Quote($email);
+        $query = $db->getQuery(true);
+        $query->select('id')
+                ->from('#__users')
+                ->where($db->quoteName('email') . " = " . $db->quote($email));
         $db->setQuery($query);
         return $db->loadResult();
+    }
+
+    /**
+     * get raas data
+     * 
+     * @param type $id
+     * @return type
+     */
+    public static function getRaasData($id) {
+        $db = JFactory::getDbo();
+        $query = $db->getQuery(true);
+        $query
+                ->select(array('u.name', 'u.username', 'u.email', 'lu.Uid'))
+                ->from($db->quoteName('#__users', 'u'))
+                ->join('INNER', $db->quoteName('#__loginradius_users', 'lu') . ' ON (' . $db->quoteName('lu.id') . ' = ' . $db->quoteName('u.id') . ')')
+                ->where($db->quoteName('u.id') . " = " . $db->quote($id));
+        $db->setQuery($query);
+        return $db->LoadAssocList();
     }
 
     /**
@@ -508,7 +640,8 @@ class plgSystemUserRegistrationTools {
             } else {
                 $userId = plgSystemUserRegistrationTools::registrationProcess($userProfile, $accessToken);
                 if ($userId) {
-                    plgSystemUserRegistrationTools::insertSocialData($userId, $userProfile);
+
+                    $returnId = plgSystemUserRegistrationTools::insertSocialData($userId, $userProfile);
                     plgSystemUserRegistrationTools::loginExistUser($userId, $userProfile, $accessToken, true);
                 }
             }
@@ -536,8 +669,15 @@ class plgSystemUserRegistrationTools {
      */
     public static function checkBlockUser($socialId) {
         $db = JFactory::getDbo();
-        $query = "SELECT u.id FROM #__users AS u INNER JOIN #__loginradius_users AS lu ON lu.id = u.id WHERE lu.LoginRadius_id = " . $db->Quote($socialId) . " AND u.block = 1";
+        $query = $db->getQuery(true);
+        $query
+                ->select(array('u.id'))
+                ->from($db->quoteName('#__users', 'u'))
+                ->join('INNER', $db->quoteName('#__loginradius_users', 'lu') . ' ON (' . $db->quoteName('lu.id') . ' = ' . $db->quoteName('u.id') . ')')
+                ->where($db->quoteName('lu.LoginRadius_id') . " = " . $db->quote($socialId) . " AND " . $db->quoteName('u.block') . " = 1");
+
         $db->setQuery($query);
+
         $blockId = $db->loadResult();
         if (!empty($blockId) || $blockId) {
             JError::raiseWarning('', JText::_('COM_SOCIALLOGIN_USER_BLOCK'));
@@ -554,7 +694,13 @@ class plgSystemUserRegistrationTools {
      */
     public static function checkActivateUser($socialId) {
         $db = JFactory::getDbo();
-        $query = "SELECT u.id FROM #__users AS u INNER JOIN #__loginradius_users AS lu ON lu.id = u.id WHERE lu.LoginRadius_id = " . $db->Quote($socialId) . " AND u.activation != '' AND u.activation != 0";
+        $query = $db->getQuery(true);
+        $query
+                ->select(array('u.id'))
+                ->from($db->quoteName('#__users', 'u'))
+                ->join('INNER', $db->quoteName('#__loginradius_users', 'lu') . ' ON (' . $db->quoteName('lu.id') . ' = ' . $db->quoteName('u.id') . ')')
+                ->where($db->quoteName('lu.LoginRadius_id') . " = " . $db->quote($socialId) . " AND " . $db->quoteName('u.activation') . " !=  ''" . " AND " . $db->quoteName('u.activation') . " != 0");
+
         $db->setQuery($query);
         $activate = $db->loadResult();
         if (!empty($activate) || $activate) {
@@ -573,13 +719,24 @@ class plgSystemUserRegistrationTools {
      */
     public static function insertSocialData($userId, $userProfile) {
         $db = JFactory::getDbo();
-        $query = "SELECT lu.id FROM #__loginradius_users AS lu WHERE lu.LoginRadius_id = " . $db->Quote($userProfile->ID) . " AND id = " . $db->Quote($userId);
+        $query = $db->getQuery(true);
+        $query->select('id')
+                ->from('#__loginradius_users')
+                ->where($db->quoteName('LoginRadius_id') . " = " . $db->quote($userProfile->ID) . " AND " . $db->quoteName('id') . " = " . $db->quote($userId));
+
         $db->setQuery($query);
+
         $lastId = $db->loadResult();
         if (!isset($lastId) && empty($lastId)) {
             $userImage = plgSystemUserRegistrationTools::addNewIdImage($userProfile->thumbnail, $userProfile->ID);
-            $sql = "INSERT INTO #__loginradius_users SET id = " . $db->Quote($userId) . ", LoginRadius_id = " . $db->Quote($userProfile->ID) . ", provider = " . $db->Quote($userProfile->Provider) . ", Uid = " . $db->Quote($userProfile->Uid) . ", lr_picture = " . $db->Quote($userImage);
-            $db->setQuery($sql);
+            $columns = array('id', 'LoginRadius_id', 'provider', 'Uid', 'lr_picture');
+            $values = array($db->quote($userId), $db->quote($userProfile->ID), $db->quote($userProfile->Provider), $db->quote($userProfile->Uid), $db->quote($userImage));
+            $query = $db->getQuery(true)
+                    ->insert($db->quoteName('#__loginradius_users'))
+                    ->columns($db->quoteName($columns))
+                    ->values(implode(',', $values));
+            $db->setQuery($query);
+
             return $db->execute();
         }
     }
@@ -592,8 +749,10 @@ class plgSystemUserRegistrationTools {
      */
     public static function removeSocialData($socialId) {
         $db = JFactory::getDbo();
-        $sql = "DELETE FROM #__loginradius_users WHERE LoginRadius_id = " . $db->Quote($socialId);
-        $db->setQuery($sql);
+        $query = $db->getQuery(true);
+        $query->delete($db->quoteName('#__loginradius_users'));
+        $query->where($db->quoteName('LoginRadius_id') . " = " . $db->quote($socialId));
+        $db->setQuery($query);
         return $db->execute();
     }
 
@@ -721,6 +880,7 @@ class plgSystemUserRegistrationTools {
         $session = JFactory::getSession();
         $settings = plgSystemUserRegistrationTools::getSettings();
         $raas_user = new LoginRadiusSDK\SocialLogin\SocialLoginAPI($settings['apikey'], $settings['apisecret'], array('output_format' => 'json'));
+
         if (JRequest::getVar('cancel')) {
             // Redirect after Cancel click.
             $session->clear('tmpuser');
@@ -730,17 +890,20 @@ class plgSystemUserRegistrationTools {
             try {
                 $userProfile = $raas_user->getUserProfiledata($accessToken);
             } catch (LoginRadiusException $e) {
-                
-                if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-                    $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
+
+                if (isset($e->getErrorResponse()->message) && $e->getErrorResponse()->message) {
+                    $mainframe->enqueueMessage($e->getErrorResponse()->message, 'error');
                 }
             }
             if (isset($userProfile->ID)) {
-                $query = "SELECT u.id FROM #__users AS u INNER JOIN #__loginradius_users AS lu ON lu.id = u.id WHERE lu.LoginRadius_id = " . $db->Quote($userProfile->ID);
-                $db->setQuery($query);
-                $userId = $db->loadResult();
-                if (!empty($userId)) {
-                    self::userLogin($userId, $userProfile, false);
+                if (JVERSION < 3) {
+                    $dispatcher = JDispatcher::getInstance();
+                } else {
+                    $dispatcher = JEventDispatcher::getInstance();
+                }
+                $userId = $dispatcher->trigger('checkProviderId', array($userProfile));
+                if (!empty($userId[0])) {
+                    self::userLogin($userId[0], $userProfile, false);
                 }
             }
             $redirect = plgSystemUserRegistrationTools::getReturnURL();
@@ -755,7 +918,10 @@ class plgSystemUserRegistrationTools {
                 if (!JMailHelper::isEmailAddress($email)) {
                     plgSystemUserRegistrationTools::emailPopup($msg, $msgTitle, $msgType);
                 } else {
-                    $query = "SELECT id FROM #__users WHERE email=" . $db->Quote($email);
+                    $query = $db->getQuery(true)
+                            ->select('id')
+                            ->from($db->quoteName('#__users'))
+                            ->where($db->quoteName('email') . " = " . $db->quote($email));
                     $db->setQuery($query);
                     $userExist = $db->loadResult();
                     if ($userExist != 0) {
@@ -773,33 +939,82 @@ class plgSystemUserRegistrationTools {
                 $mainframe->redirect(JURI::base(), JText::_('COM_SOCIALLOGIN_SESSION_EXPIRED'), 'error');
             }
         } elseif (JRequest::getVar('loginRadiusReferralSubmit') && JRequest::getVar('loginRadiusIdentifier')) {
+    
             $accessToken = trim(JRequest::getVar('loginRadiusIdentifier'));
             $provider = trim(JRequest::getVar('loginRadiusProvider'));
             if (!JRequest::getVar('loginRadiusContacts') || count(JRequest::getVar('loginRadiusContacts')) <= 0) {
                 // get contacts' Social IDs
-                plgSystemUserRegistrationSendMessage::friendInvatePopup($provider, $accessToken, 'error', 'Please select contacts to send referral to.', $settings);
+                plgSystemUserRegistrationSendMessage::friendInvitePopup($provider, $accessToken, 'error', 'Please select contacts to send referral to.', $settings);
                 return;
             }
-            $contacts = JRequest::getVar('loginRadiusContacts');
+            $contacts = JRequest::getVar('loginRadiusContacts');           
             plgSystemUserRegistrationSendMessage::sendMessageToSelctedContacts($contacts, $provider, $accessToken);
 
             try {
                 $userProfile = $raas_user->getUserProfiledata($accessToken);
             } catch (LoginRadiusException $e) {
-                if (isset($e->getErrorResponse()->description) && $e->getErrorResponse()->description) {
-                    $mainframe->enqueueMessage($e->getErrorResponse()->description, 'error');
+                if (isset($e->getErrorResponse()->message) && $e->getErrorResponse()->message) {
+                    $mainframe->enqueueMessage($e->getErrorResponse()->message, 'error');
                 }
             }
 
             if (isset($userProfile->ID)) {
-                $query = "SELECT u.id FROM #__users AS u INNER JOIN #__loginradius_users AS lu ON lu.id = u.id WHERE lu.LoginRadius_id = " . $db->Quote($userProfile->ID);
-                $db->setQuery($query);
-                $userId = $db->loadResult();
-                if (!empty($userId)) {
-                    self::userLogin($userId, $userProfile, false);
+                if (JVERSION < 3) {
+                    $dispatcher = JDispatcher::getInstance();
+                } else {
+                    $dispatcher = JEventDispatcher::getInstance();
+                }
+                $userId = $dispatcher->trigger('checkProviderId', array($userProfile));
+                if (!empty($userId[0])) {
+                    self::userLogin($userId[0], $userProfile, false);
                 }
             }
         }
+    }
+    
+    public static function userLoginViaAjax($userId, $userProfile, $newUser) {
+        $db = JFactory::getDBO();
+        $mainframe = JFactory::getApplication();
+        $user = JUser::getInstance((int) $userId);
+        if ($user->get('block') == '1') {
+            return;
+        }
+        // Register session variables
+        $session = JFactory::getSession();
+        $query = $db->getQuery(true);
+        $query->select('Uid, lr_picture')
+                ->from('#__loginradius_users')
+                ->where($db->quoteName('LoginRadius_id') . " = " . $db->quote($userProfile->ID) . " AND " . $db->quoteName('id') . " = " . $db->quote($user->get('id')));
+
+        $db->setQuery($query);
+        $getUserData = $db->loadObjectList();
+
+        $session->set('user_picture', $getUserData[0]->lr_picture);
+        $session->set('Uid', $getUserData[0]->Uid);
+        $session->set('user_lrid', $userProfile->ID);
+        $session->set('emailVerified', $userProfile->EmailVerified);
+        $session->set('provider', $userProfile->Provider);
+        $session->set('user', $user);
+        // Getting the session object
+        $table = JTable::getInstance('session');
+        $table->load($session->getId());
+        $table->guest = '0';
+        $table->username = $user->get('username');
+        $table->userid = intval($user->get('id'));
+        $table->usertype = $user->get('usertype');
+        $table->gid = $user->get('gid');
+        $table->update();
+        $user->setLastVisit();
+        //Redirect after Login
+        $redirect = self::getReturnURL($newUser);
+        $settings = self::getSettings();
+        if (isset($settings['LoginRadius_' . strtolower($userProfile->Provider) . 'DMEnable']) &&
+                $settings['LoginRadius_' . strtolower($userProfile->Provider) . 'DMEnable'] == '1' &&
+                isset($settings[strtolower($userProfile->Provider) . 'MessageFriends']) &&
+                $settings[strtolower($userProfile->Provider) . 'MessageFriends'] == '1') {
+            $redirect = JRoute::_('index.php?option=com_userregistrationandmanagement&view=profile', false);
+        }
+        return $redirect;  
     }
 
 }

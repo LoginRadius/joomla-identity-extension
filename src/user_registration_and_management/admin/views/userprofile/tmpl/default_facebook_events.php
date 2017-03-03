@@ -11,8 +11,7 @@ defined('_JEXEC') or die;
 if (count($this->getfacebookevents) > 0):
     $this->pagenotfound = false;
     echo JHtml::_('tabs.panel', JText::_('COM_SOCIALLOGIN_PANEL_FACEBOOK_EVENTS'), 'panel9');
-    ?>
-    <h2 class="head"><?php echo JText::_('COM_SOCIALLOGIN_FACEBOOK_EVENTS'); ?></h2>
+    ?>    
     <table class="form-table sociallogin_table" cellspacing="0">
         <thead>
             <tr>

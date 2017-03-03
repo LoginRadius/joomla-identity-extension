@@ -74,6 +74,17 @@ CREATE TABLE IF NOT EXISTS `#__loginradius_companies` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
+CREATE TABLE IF NOT EXISTS `#__loginradius_log` (
+  `log_id` int(11) NOT NULL AUTO_INCREMENT,
+  `api_url` varchar(255) DEFAULT NULL,
+  `request_type` varchar(255) DEFAULT NULL,
+  `data` text DEFAULT NULL,
+  `response` text DEFAULT NULL,
+  `response_type` varchar(255) DEFAULT NULL,
+  `timestamp` int(11) DEFAULT NULL,
+  PRIMARY KEY (`log_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
+
 CREATE TABLE IF NOT EXISTS `#__loginradius_contacts` (
   `user_id` int(11) NOT NULL,
   `contact_id` varchar(30) NOT NULL,
@@ -143,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `#__loginradius_extended_profile_data` (
   `user_id` int(11) NOT NULL,
   `website` varchar(500) DEFAULT NULL,
   `favicon` varchar(1000) DEFAULT NULL,
-  `industry` varchar(200) DEFAULT NULL,
+  `industry` varchar(200) DEFAULT NULL,  
   `about` text,
   `timezone` varchar(100) DEFAULT NULL,
   `verified` varchar(10) DEFAULT NULL,
@@ -169,6 +180,7 @@ CREATE TABLE IF NOT EXISTS `#__loginradius_extended_profile_data` (
   `professional_headline` varchar(1000) DEFAULT NULL,
   `provider_access_token` varchar(100) DEFAULT NULL,
   `provider_token_secret` varchar(100) DEFAULT NULL,
+  `no_of_logins` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

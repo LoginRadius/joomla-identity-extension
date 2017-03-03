@@ -9,7 +9,6 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 JHtml::_('behavior.tooltip');
 jimport('joomla.plugin.helper');
-
 $enableVerticalArticalType = $disableVerticalArticalType = $enableHorizontalArticalType = $disableHorizontalArticalType = $enableEmailReadOnly = $disableEmailReadOnly = $enableCustomPopup = $disableCustomPopup = $enableSingleWindow = $disableSingleWindow = $enableShareCount = $disableShareCount = $enableShortUrl = $disableShortUrl = $enableMobileFriendly = $disableMobileFriendly = $enableHorizontalShare = $disableHorizontalShare = $horizontalTheme32 = $horizontalTheme16 = $horizontalThemeLarge = $horizontalThemeSmall = $horizontalCounter32 = $horizontalCounter16 = $responcive = $enableVerticalShare = $disableVerticalShare = $topLeft = $topRight = $bottomLeft = $bottomRight = $verticalTheme32 = $verticalTheme16 = $verticalCounterTheme32 = $verticalCounterTheme16 = "";
 if (isset($this->settings['emailreadonly']) && $this->settings['emailreadonly'] == '0')
     $disableEmailReadOnly = "checked='checked'";
@@ -144,14 +143,9 @@ switch ($this->settings['verticalsharepos']) {
                         <a href="http://ish.re/10E78" target="_blank">Wordpress</a>,
                         <a href="http://ish.re/TRXK" target="_blank">Drupal</a>,
                         <a href="http://ish.re/UF5L" target="_blank">Magento</a>,
-<!--                        <a href="http://ish.re/8PEG" target="_blank">osCommerce</a>,
-                        <a href="http://ish.re/96IC" target="_blank">Zen-Cart</a>,
-                        <a href="http://ish.re/8PFQ" target="_blank">X-Cart</a>,-->
                         <a href="http://ish.re/TRXU" target="_blank">Prestashop</a>,
                         <a href="http://ish.re/TRXR" target="_blank">VanillaForum</a>,
-                        <a href="http://ish.re/TRXM" target="_blank">vBulletin</a>,
-                        <a href="http://ish.re/TRY3" target="_blank">phpBB</a>,
-                        <a href="http://ish.re/TRY2" target="_blank">SMF</a>
+                        <a href="http://ish.re/TRXM" target="_blank">vBulletin</a>,                    
                         <?php echo JText::_('COM_SOCIALLOGIN_THANK_BLOCK_TWO_AND'); ?>
                         <a href="http://ish.re/TRY1" target="_blank">DotNetNuke</a> !
                     </div>
@@ -191,26 +185,32 @@ switch ($this->settings['verticalsharepos']) {
                             <input name="settings[choosehorizontalshare]" id="hori32" onclick="createHorzontalShareProvider();" type="radio" <?php echo $horizontalTheme32; ?>value="0"/>
                             <img src='<?php echo "components/com_userregistrationandmanagement/assets/img/horizonSharing32.png" ?>'/>
                         </label>
+                            <div style="clear:both;"></div>
                         <label for="hori16" class="imagehori">
                             <input name="settings[choosehorizontalshare]" id="hori16" onclick="createHorzontalShareProvider();" type="radio" <?php echo $horizontalTheme16; ?>value="1"/>
                             <img src='<?php echo "components/com_userregistrationandmanagement/assets/img/horizonSharing16.png" ?>'/>
                         </label>
+                            <div style="clear:both;"></div>
                         <label for="responcive" class="imagehori">
                             <input name="settings[choosehorizontalshare]" id="responcive" onclick="createHorzontalShareProvider();" type="radio" <?php echo $responcive; ?>value="6"/>
-                            <img style=" margin-top: -25px; margin-left: 26px;" src='<?php echo "components/com_userregistrationandmanagement/assets/img/responsive-icons.png" ?>'/>
+                            <img id="responsiveimg" src='<?php echo "components/com_userregistrationandmanagement/assets/img/responsive-icons.png" ?>'/>
                         </label>
+                            <div style="clear:both;"></div>
                         <label for="horithemelarge" class="imagehori">
                             <input name="settings[choosehorizontalshare]" id="horithemelarge" onclick="singleImgShareProvider();" type="radio" <?php echo $horizontalThemeLarge; ?>value="2"/>
                             <img src='<?php echo "components/com_userregistrationandmanagement/assets/img/single-image-theme-large.png" ?>'/>
                         </label>
+                            <div style="clear:both;"></div>
                         <label for="horithemesmall" class="imagehori">
                             <input name="settings[choosehorizontalshare]" id="horithemesmall" onclick="singleImgShareProvider();" type="radio" <?php echo $horizontalThemeSmall; ?>value="3"/>
                             <img src='<?php echo "components/com_userregistrationandmanagement/assets/img/single-image-theme-small.png" ?>'/>
                         </label>
+                            <div style="clear:both;"></div>
                         <label for="chori16" class="imagehori">
                             <input name="settings[choosehorizontalshare]" id="chori16" onclick="createHorizontalCounterProvider();" type="radio" <?php echo $horizontalCounter16; ?>value="4"/>
                             <img src='<?php echo "components/com_userregistrationandmanagement/assets/img/hybrid-horizontal-horizontal.png" ?>'/>
                         </label>
+                            <div style="clear:both;"></div>
                         <label for="chori32" class="imagehori">
                             <input name="settings[choosehorizontalshare]" id="chori32" onclick="createHorizontalCounterProvider();" type="radio" <?php echo $horizontalCounter32; ?>value="5"/>
                             <img src='<?php echo "components/com_userregistrationandmanagement/assets/img/hybrid-horizontal-vertical.png" ?>'/>
@@ -278,7 +278,7 @@ switch ($this->settings['verticalsharepos']) {
                         <label class="lrlabelselect1"><input name="settings[horizontalarticaltype]" type="radio" <?php echo $disableHorizontalArticalType; ?> value="0"/> <?php echo JText::_('COM_SOCIAL_SHARE_ARTICLE_LIST'); ?></label> </div>
                     
                         <select id="horizontalArticles" name="horizontalArticles[]" multiple="multiple" style="width:400px;<?php if(empty($enableHorizontalArticalType)){echo 'display:none;';}?>">
-                            <?php foreach ($this->articles as $row) {
+                           <?php foreach ($this->articles as $row) {
                                 ?>
                                 <option <?php
                             if (!empty($this->settings['horizontalArticles'])) {
@@ -288,12 +288,12 @@ switch ($this->settings['verticalsharepos']) {
                                     }
                                 }
                             }
-                                ?>value="<?php echo $row->id; ?>">
+                                ?>value="<?php echo $row->id; ?>">                                 
                                 <?php echo $row->title; ?>
                                 </option>
                             <?php } ?>
-                        </select>
-                    </div>
+                        </select>                    
+                    </div>                    
                     <div id="sharevertical" style="display:none;">
                     <div style="overflow:auto; background:#FFFFFF; padding:10px;">
                         <!--enable vertical share-->
@@ -397,6 +397,7 @@ switch ($this->settings['verticalsharepos']) {
                                 </option>
                             <?php } ?>
                         </select>
+                    
                     </div>
                     <div id="shareadvance" style="display:none;">
                    <div style="overflow:auto; background:#FFFFFF; padding:10px;">
@@ -461,7 +462,8 @@ switch ($this->settings['verticalsharepos']) {
                         <p><?php echo JText::_('COM_SOCIAL_SHARE_CUSTOM_OPTIONS_HINT'); ?></p>
                     </div>
                 </div>
-                </div>
+                </div>    
+              
             </td>
         </tr>
     </table>

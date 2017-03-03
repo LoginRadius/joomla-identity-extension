@@ -6,7 +6,7 @@
  * @copyright   Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
- defined('_JEXEC') or die('Direct Access to this location is not allowed.');
+defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 JHtml::_('behavior.tooltip');
 jimport('joomla.plugin.helper');
 jimport('joomla.html.html.tabs');
@@ -22,12 +22,10 @@ $options = array('onActive' => 'function(title, description){
     'startOffset' => 0, // 0 starts on the first tab, 1 starts the second, etc...
     'useCookie' => true, // this must not be a string. Don't use quotes.
 );
-if (!JPluginHelper::isEnabled('system', 'userregistration'))
-{
+if (!JPluginHelper::isEnabled('system', 'userregistration')) {
     JError::raiseNotice('sociallogin_plugin', JText::_('COM_SOCIALLOGIN_PLUGIN_ERROR'));
 }
-if (!JPluginHelper::isEnabled('content', 'socialshare'))
-{
+if (!JPluginHelper::isEnabled('content', 'socialshare')) {
     JError::raiseNotice('sociallogin_plugin', JText::_('COM_SOCIALSHARE_PLUGIN_ERROR'));
 }
 ?>
@@ -53,9 +51,7 @@ if (!JPluginHelper::isEnabled('content', 'socialshare'))
                         <a href="http://ish.re/UF5L" target="_blank">Magento</a>,
                         <a href="http://ish.re/TRXU" target="_blank">Prestashop</a>,
                         <a href="http://ish.re/TRXR" target="_blank">VanillaForum</a>,
-                        <a href="http://ish.re/TRXM" target="_blank">vBulletin</a>,
-                        <a href="http://ish.re/TRY3" target="_blank">phpBB</a>,
-                        <a href="http://ish.re/TRY2" target="_blank">SMF</a>
+                        <a href="http://ish.re/TRXM" target="_blank">vBulletin</a>,               
                         <?php echo JText::_('COM_SOCIALLOGIN_THANK_BLOCK_TWO_AND'); ?>
                         <a href="http://ish.re/TRY1" target="_blank">DotNetNuke</a> !
                     </div>
@@ -79,22 +75,57 @@ if (!JPluginHelper::isEnabled('content', 'socialshare'))
             <?php echo JHtml::_('tabs.panel', JText::_('COM_SOCIALLOGIN_PANEL_ADVANCE'), 'panel2'); ?>
             <?php echo $this->loadTemplate('advance'); ?>
             <!-- End User registration advance -->
-            <!-- User registration Profile Data -->            
-            <?php echo JHtml::_('tabs.panel', JText::_('COM_SOCIALLOGIN_PANEL_PROFILEDATA'), 'panel3'); ?>
-             <?php echo $this->loadTemplate('profile_data'); ?>
-            <!-- End User registration Profile Data -->
             <!-- User registration post messages -->           
-            <?php echo JHtml::_('tabs.panel', JText::_('COM_SOCIALLOGIN_PANEL_POSTSTATUS'), 'panel4'); ?>
-             <?php echo $this->loadTemplate('post_message'); ?>
+            <?php echo JHtml::_('tabs.panel', JText::_('COM_SOCIALLOGIN_PANEL_POSTSTATUS'), 'panel3'); ?>
+            <?php echo $this->loadTemplate('post_message'); ?>
             <!-- End User registration post messages -->
             <!-- User User registration send email/messages -->           
-            <?php echo JHtml::_('tabs.panel', JText::_('COM_SOCIALLOGIN_PANEL_SENDMESSAGE'), 'panel5'); ?>
+            <?php echo JHtml::_('tabs.panel', JText::_('COM_SOCIALLOGIN_PANEL_SENDMESSAGE'), 'panel4'); ?>
             <?php echo $this->loadTemplate('send_message'); ?>  
-            <!-- End User registration send email/messages -->
+            <!-- User registration Profile Data -->           
+            <?php
+            $settings = 'socialprofiledata';
+            if (JVERSION < 3) {
+                $dispatcher = JDispatcher::getInstance();
+            } else {
+                $dispatcher = JEventDispatcher::getInstance();
+            }
+            $response = $dispatcher->trigger('onlrGetPluginDisabled', array($settings));
+            if (isset($response[0]) && $response[0] == '1') {
+                ?>
+                <?php echo JHtml::_('tabs.panel', JText::_('COM_SOCIALLOGIN_PANEL_PROFILEDATA'), 'panel5'); ?>
+                <?php echo $this->loadTemplate('profile_data'); ?>
+            <?php } ?>
+            <!-- End User registration Profile Data -->        
             <!-- Single sign on -->
-            <?php echo JHtml::_('tabs.panel', JText::_('COM_SOCIALLOGIN_PANEL_SSO'), 'panel6'); ?>
-            <?php echo $this->loadTemplate('sso'); ?>
-            <!-- End Single sign on -->          
+            <?php
+            $settings = 'singlesignon';
+            if (JVERSION < 3) {
+                $dispatcher = JDispatcher::getInstance();
+            } else {
+                 $dispatcher = JEventDispatcher::getInstance();
+            }
+            $result = $dispatcher->trigger('onlrGetPluginDisabled', array($settings));
+            if (isset($result[0]) && $result[0] == '1') {
+                ?>
+                <?php echo JHtml::_('tabs.panel', JText::_('COM_SOCIALLOGIN_PANEL_SSO'), 'panel6'); ?>
+                <?php echo $this->loadTemplate('sso'); ?>
+            <?php } ?>
+             <!-- End Single sign on -->  
+            <?php
+            $settings = 'hostedpage';           
+            if (JVERSION < 3) {
+                $dispatcher = JDispatcher::getInstance();
+            } else {
+                 $dispatcher = JEventDispatcher::getInstance();
+            }
+            $result = $dispatcher->trigger('onlrGetPluginDisabled', array($settings));
+            if (isset($result[0]) && $result[0] == '1') {
+                ?>
+                <?php echo JHtml::_('tabs.panel', JText::_('COM_SOCIALLOGIN_PANEL_HOSTED_PAGE'), 'panel7'); ?>
+                <?php echo $this->loadTemplate('hosted_page'); ?>
+            <?php }?>
+                   
         </div>
 
         <div class="section30">
