@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="module" version="5.0.1" client="site" method="upgrade">
+<extension type="module" version="6.0.0" client="site" method="upgrade">
     <name>User Registration Module</name>
     <creationDate>2017-01-01</creationDate>
     <author>LoginRadius</author>
@@ -7,7 +7,7 @@
     <authorUrl>www.LoginRadius.com</authorUrl>
     <copyright>Copyright (C) 2017 - till Open Source Matters. All rights reserved.</copyright>
     <license>GPL 2.0</license>
-    <version>5.0.1</version>
+    <version>6.0.0</version>
     <description>LoginRadius enables User Registration for your joomla websites.</description>
     <files>
         <filename module="mod_userregistration">mod_userregistration.php</filename>

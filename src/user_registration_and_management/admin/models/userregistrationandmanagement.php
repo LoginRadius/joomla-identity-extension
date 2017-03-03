@@ -423,7 +423,7 @@ class UserRegistrationAndManagementModelUserRegistrationAndManagement extends JM
            
     $result['data'] = array(
       'addon' => $jversion->getLongVersion(),
-      'version' => '5.0.1',
+      'version' => '6.0.1',
       'agentstring' => $agentstring,
       'clientip' => $clientip,
       'configuration' => $string

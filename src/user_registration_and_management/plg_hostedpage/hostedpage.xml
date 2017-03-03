@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="5.0.1" type="plugin" group="system">
+<extension version="6.0.0" type="plugin" group="system">
     <name>Hosted Page Plugin</name>
     <license>GNU/GPL</license>
     <author>LoginRadius</author>
@@ -7,7 +7,7 @@
     <authorUrl>http://www.loginradius.com</authorUrl>
     <creationDate>2017-01-01</creationDate>
     <copyright>2017 to till</copyright>
-    <version>5.0.1</version>
+    <version>6.0.0</version>
     <description>
         LoginRadius enables Hosted Page for your joomla websites.
     </description>
