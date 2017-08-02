@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" version="7.0.0" method="upgrade">
+    <name>CIAM LoginRadius</name>
+    <license>Open Source License, GPL v2 based</license>
+    <author>LoginRadius</author>
+    <authorEmail>developers@loginradius.com</authorEmail>
+    <authorUrl>http://www.loginradius.com</authorUrl>
+    <creationDate>2017-08-01</creationDate>
+    <copyright>2017, LoginRadius</copyright>
+    <version>7.0.0</version>
+    <description>LoginRadius enables user registration for your joomla websites.</description>
+
+    <!-- Installation -->	
+    <scriptfile>install/script_ciamloginradius.php</scriptfile>
+    <install>
+        <sql>
+            <file driver="mysql" charset="utf8">install/install.mysql.utf8.sql</file>
+        </sql>
+    </install>	
+    <uninstall>
+        <sql>
+            <file driver="mysql" charset="utf8">install/uninstall.mysql.utf8.sql</file>
+        </sql>
+    </uninstall>
+    <update> 
+        <schemas> 
+            <schemapath type="mysql">sql/updates</schemapath> 
+        </schemas> 
+    </update>
+    <!-- Component -->
+    <files folder="site">				
+        <filename>index.html</filename>
+        <filename>edit.xml</filename>
+        <filename>metadata.xml</filename>
+        <filename>ciamloginradius.php</filename>
+        <filename>controller.php</filename>
+        <filename>router.php</filename>
+        <folder>views</folder>
+        <folder>controllers</folder>
+        <folder>models</folder>
+        <folder>assets</folder>
+        <folder>helpers</folder>		
+    </files>
+    <media destination="com_ciamloginradius" folder="media">
+        <filename>index.html</filename>
+        <folder>images</folder>
+    </media>
+	
+    <!-- Administration -->
+    <administration>
+        <menu img="../media/com_ciamloginradius/images/favicon.png">COM_CIAM_LOGINRADIUS</menu>
+        <files folder="admin">
+            <folder>assets</folder>
+            <folder>install</folder>
+            <folder>models</folder>
+            <folder>views</folder>
+            <folder>sql/updates</folder>
+            <file>index.html</file>
+            <file>access.xml</file>
+            <file>controller.php</file>
+            <file>ciamloginradius.php</file>
+        </files>
+        <languages folder="admin/language">
+            <language tag="en-GB">en-GB/en-GB.com_ciamloginradius.ini</language>
+        </languages>
+    </administration>	
+    <languages folder="language">
+        <language tag="en-GB">en-GB/en-GB.com_ciamloginradius.ini</language>
+        <language tag="en-GB">en-GB/en-GB.mod_ciam.ini</language>
+        <language tag="en-GB">en-GB/en-GB.mod_ciam.sys.ini</language>
+    </languages>
+	
+    <!-- Modules -->
+    <modules>
+        <module module="mod_ciam" title="Ciam module" position="position-7" order="8" client="site" language="*" showtitle="0">
+            <files folder="mod_ciam">
+                <filename module="mod_ciam">mod_ciam.php</filename>
+                <folder>tmpl</folder>
+                <filename>mod_ciam.xml</filename>
+                <filename>index.html</filename>
+            </files>		
+        </module>
+    </modules>	
+    
+    <!-- Plugins -->
+    <plugins>    
+        <plugin plugin="ciam" title="CIAM plugin" order="-100" group="system">
+            <files folder="plg_ciam">
+                <file plugin="ciam">ciam.php</file>
+                <file>ciam.xml</file>
+                <file>customhttpclient.php</file>
+                <folder>css</folder>           
+                <folder>helper</folder>
+                <folder>LoginRadiusSDK</folder>	
+                <file>index.html</file>                
+            </files>
+        </plugin>   
+        <plugin plugin="singlesignon" title="Single Sign On Plugin" order="-100" group="system">
+            <files folder="plg_singlesignon">
+                <file plugin="singlesignon">singlesignon.php</file>
+                <file>singlesignon.xml</file>
+                <file>index.html</file>			
+            </files>
+        </plugin>           
+    </plugins>	
+</extension>
