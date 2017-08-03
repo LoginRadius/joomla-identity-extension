@@ -1,6 +1,10 @@
 #  Joomla Customer Identity Extension for 2.x and 3.X
 ## ChangeLog:-
 
+# Version 7.0.1 
+## Enhancements 
+    -  Added license file.
+    -  Changed extension installation link in readme.  
 
 # Version 7.0.0 
 ## Enhancements 

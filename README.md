@@ -16,7 +16,7 @@ Please visit [here](http://www.loginradius.com/) for more information.
 
 ## Documentation
 * [User Registration](http://apidocs.loginradius.com/docs/user-registration) - Everything you need to implement the full LoginRadius User Registration system including Social Login.
-* [Extension Installation](http://support.loginradius.com/hc/en-us/articles/210000303-Joomla-Customer-Identity-Extension-instructions-for-v3-x) - Everything you need to implement with joomla.
+* [Extension Installation](https://docs.loginradius.com/api/v2/cms-turn-key-plugins/joomla-customer-identity-extension-instructions-for-v2-x-and-v3.x) - Everything you need to implement with joomla.
 
 
 General documentation regarding the LoginRadius REST API and related flows can be found on the [LoginRadius API Documentations](http://apidocs.loginradius.com/) site. 
